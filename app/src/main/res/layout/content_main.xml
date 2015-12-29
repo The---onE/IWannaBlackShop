@@ -20,17 +20,21 @@
         android:gravity="center"
         android:text="@string/add_item" />
 
-    <cn.bingoogolapple.refreshlayout.BGARefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/rl_modulename_refresh"
+    <cn.bingoogolapple.refreshlayout.BGARefreshLayout
+        android:id="@+id/item_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <ListView
+            android:id="@+id/item_list"
+            style="@style/MatchAuto"
+            android:layout_gravity="center"
+            android:fastScrollEnabled="true"
+            android:gravity="center"
+            android:padding="10dp"
+            android:scrollbars="vertical"
+            android:verticalSpacing="16dp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="test" />
     </cn.bingoogolapple.refreshlayout.BGARefreshLayout>
 
 </LinearLayout>

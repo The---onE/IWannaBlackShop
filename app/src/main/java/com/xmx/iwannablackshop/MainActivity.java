@@ -1,24 +1,24 @@
 package com.xmx.iwannablackshop;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ListView;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVOSCloud;
 import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.SaveCallback;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
+import com.xmx.iwannablackshop.Adapter.ItemAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import cn.bingoogolapple.refreshlayout.BGANormalRefreshViewHolder;
 import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
@@ -27,7 +27,19 @@ import cn.bingoogolapple.refreshlayout.BGARefreshViewHolder;
 public class MainActivity extends BaseNavigationActivity
         implements BGARefreshLayout.BGARefreshLayoutDelegate {
 
-    private BGARefreshLayout mRefreshLayout;
+    final static int LOAD_LIMIT = 30;
+
+    BGARefreshLayout mRefreshLayout;
+    ListView mItemList;
+    ItemAdapter mItemAdapter;
+    boolean loadedFlag = false;
+    ArrayList<String> mTitles = new ArrayList<>();
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        onBGARefreshLayoutBeginRefreshing(mRefreshLayout);
+    }
 
     @Override
     protected void initView(Bundle savedInstanceState) {
@@ -44,14 +56,17 @@ public class MainActivity extends BaseNavigationActivity
             }
         });
 
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
+        initRefreshLayout();
+        initItemList();
+
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//            }
+//        });
     }
 
     @Override
@@ -121,8 +136,8 @@ public class MainActivity extends BaseNavigationActivity
         return true;
     }
 
-    private void initRefreshLayout(BGARefreshLayout refreshLayout) {
-        mRefreshLayout = (BGARefreshLayout) findViewById(R.id.rl_modulename_refresh);
+    private void initRefreshLayout() {
+        mRefreshLayout = getViewById(R.id.item_refresh);
         // 为BGARefreshLayout设置代理
         mRefreshLayout.setDelegate(this);
         // 设置下拉刷新和上拉加载更多的风格     参数1：应用程序上下文，参数2：是否具有上拉加载更多功能
@@ -130,10 +145,10 @@ public class MainActivity extends BaseNavigationActivity
         // 设置下拉刷新和上拉加载更多的风格
         mRefreshLayout.setRefreshViewHolder(refreshViewHolder);
 
-
-        // 为了增加下拉刷新头部和加载更多的通用性，提供了以下可选配置选项  -------------START
         // 设置正在加载更多时的文本
         refreshViewHolder.setLoadingMoreText("正在加载");
+
+        // 为了增加下拉刷新头部和加载更多的通用性，提供了以下可选配置选项  -------------START
         // 设置整个加载更多控件的背景颜色资源id
         //refreshViewHolder.setLoadMoreBackgroundColorRes(loadMoreBackgroundColorRes);
         // 设置整个加载更多控件的背景drawable资源id
@@ -147,13 +162,104 @@ public class MainActivity extends BaseNavigationActivity
         // 可选配置  -------------END
     }
 
+    private void initItemList() {
+        mItemList = getViewById(R.id.item_list);
+//        mItemList.setOnItemClickListener(this);
+//        mItemList.setOnItemLongClickListener(this);
+
+        AVQuery<AVObject> query = new AVQuery<>("Item");
+        query.whereEqualTo("status", 0);
+        query.limit(LOAD_LIMIT);
+        query.orderByDescending("pubTimestamp");
+        query.findInBackground(new FindCallback<AVObject>() {
+            public void done(List<AVObject> avObjects, AVException e) {
+                if (e == null) {
+                    for (int i = 0; i < avObjects.size(); ++i) {
+                        AVObject avObject = avObjects.get(i);
+                        String s = avObject.get("content").toString();
+                        mTitles.add(s);
+                    }
+                } else {
+                    filterException(e);
+                }
+                mItemAdapter = new ItemAdapter(getApplicationContext(), mTitles);
+                mItemList.setAdapter(mItemAdapter);
+                loadedFlag = true;
+            }
+        });
+    }
+
     @Override
     public void onBGARefreshLayoutBeginRefreshing(BGARefreshLayout bgaRefreshLayout) {
+        if (loadedFlag) {
+            AVQuery<AVObject> query = new AVQuery<>("Item");
+            query.whereEqualTo("status", 0);
+            query.limit(LOAD_LIMIT);
+            query.orderByDescending("pubTimestamp");
+            query.findInBackground(new FindCallback<AVObject>() {
+                public void done(List<AVObject> avObjects, AVException e) {
+                    if (e == null) {
+                        boolean flag = false;
+                        for (int i = 0; i < avObjects.size(); ++i) {
+                            AVObject avObject = avObjects.get(i);
+                            String s = avObject.get("content").toString();
+                            if (!mTitles.contains(s)) {
+                                mTitles.add(0, s);
+                                flag = true;
+                            }
+                        }
 
+                        if (flag) {
+                            mItemAdapter.setTitles(mTitles);
+                        } else {
+                            showToast("没有更新数据");
+                        }
+                    } else {
+                        filterException(e);
+                    }
+                    mRefreshLayout.endRefreshing();
+                }
+            });
+        } else {
+            mRefreshLayout.endRefreshing();
+        }
     }
 
     @Override
     public boolean onBGARefreshLayoutBeginLoadingMore(BGARefreshLayout bgaRefreshLayout) {
-        return false;
+        if (loadedFlag) {
+            AVQuery<AVObject> query = new AVQuery<>("Item");
+            query.whereEqualTo("status", 0);
+            query.setSkip(mTitles.size());
+            query.limit(LOAD_LIMIT);
+            query.orderByDescending("pubTimestamp");
+            query.findInBackground(new FindCallback<AVObject>() {
+                public void done(List<AVObject> avObjects, AVException e) {
+                    if (e == null) {
+                        boolean flag = false;
+                        for (int i = 0; i < avObjects.size(); ++i) {
+                            AVObject avObject = avObjects.get(i);
+                            String s = avObject.get("content").toString();
+                            if (!mTitles.contains(s)) {
+                                mTitles.add(s);
+                                flag = true;
+                            }
+                        }
+
+                        if (flag) {
+                            mItemAdapter.setTitles(mTitles);
+                        } else {
+                            showToast("已加载全部");
+                        }
+                    } else {
+                        filterException(e);
+                    }
+                    mRefreshLayout.endLoadingMore();
+                }
+            });
+            return true;
+        } else {
+            return false;
+        }
     }
 }

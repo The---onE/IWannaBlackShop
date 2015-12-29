@@ -31,16 +31,16 @@ public class AddItemActivity extends BaseActivity {
                 post.put("tag", tag.getText());
                 post.put("status", 0);
                 post.put("pubUser", "XMX");
-                post.put("pubTimestamp", android.os.SystemClock.uptimeMillis());
+                post.put("pubTimestamp", System.currentTimeMillis() / 1000);
                 post.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(AVException e) {
                         if (e == null) {
                             showToast("添加分类成功");
+                            finish();
                         } else {
                             filterException(e);
                         }
-                        finish();
                     }
                 });
             }
