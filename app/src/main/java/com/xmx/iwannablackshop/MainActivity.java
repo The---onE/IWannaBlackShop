@@ -27,12 +27,13 @@ import cn.bingoogolapple.refreshlayout.BGARefreshViewHolder;
 public class MainActivity extends BaseNavigationActivity
         implements BGARefreshLayout.BGARefreshLayoutDelegate {
 
-    final static int LOAD_LIMIT = 30;
+    final static int LOAD_LIMIT = 20;
 
     BGARefreshLayout mRefreshLayout;
     ListView mItemList;
     ItemAdapter mItemAdapter;
     boolean loadedFlag = false;
+    boolean allFlag = false;
     ArrayList<String> mTitles = new ArrayList<>();
 
     @Override
@@ -228,36 +229,42 @@ public class MainActivity extends BaseNavigationActivity
     @Override
     public boolean onBGARefreshLayoutBeginLoadingMore(BGARefreshLayout bgaRefreshLayout) {
         if (loadedFlag) {
-            AVQuery<AVObject> query = new AVQuery<>("Item");
-            query.whereEqualTo("status", 0);
-            query.setSkip(mTitles.size());
-            query.limit(LOAD_LIMIT);
-            query.orderByDescending("pubTimestamp");
-            query.findInBackground(new FindCallback<AVObject>() {
-                public void done(List<AVObject> avObjects, AVException e) {
-                    if (e == null) {
-                        boolean flag = false;
-                        for (int i = 0; i < avObjects.size(); ++i) {
-                            AVObject avObject = avObjects.get(i);
-                            String s = avObject.get("content").toString();
-                            if (!mTitles.contains(s)) {
-                                mTitles.add(s);
-                                flag = true;
+            if (!allFlag) {
+                AVQuery<AVObject> query = new AVQuery<>("Item");
+                query.whereEqualTo("status", 0);
+                query.setSkip(mTitles.size());
+                query.limit(LOAD_LIMIT);
+                query.orderByDescending("pubTimestamp");
+                query.findInBackground(new FindCallback<AVObject>() {
+                    public void done(List<AVObject> avObjects, AVException e) {
+                        if (e == null) {
+                            boolean flag = false;
+                            for (int i = 0; i < avObjects.size(); ++i) {
+                                AVObject avObject = avObjects.get(i);
+                                String s = avObject.get("content").toString();
+                                if (!mTitles.contains(s)) {
+                                    mTitles.add(s);
+                                    flag = true;
+                                }
                             }
-                        }
 
-                        if (flag) {
-                            mItemAdapter.setTitles(mTitles);
+                            if (flag) {
+                                mItemAdapter.setTitles(mTitles);
+                            } else {
+                                allFlag = true;
+                                showToast("已加载全部");
+                            }
                         } else {
-                            showToast("已加载全部");
+                            filterException(e);
                         }
-                    } else {
-                        filterException(e);
+                        mRefreshLayout.endLoadingMore();
                     }
-                    mRefreshLayout.endLoadingMore();
-                }
-            });
-            return true;
+                });
+                return true;
+            } else {
+                showToast("已加载全部");
+                return false;
+            }
         } else {
             return false;
         }

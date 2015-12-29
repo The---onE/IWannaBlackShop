@@ -31,6 +31,7 @@
             android:layout_gravity="center"
             android:fastScrollEnabled="true"
             android:gravity="center"
+            android:overScrollMode="never"
             android:padding="10dp"
             android:scrollbars="vertical"
             android:verticalSpacing="16dp" />
