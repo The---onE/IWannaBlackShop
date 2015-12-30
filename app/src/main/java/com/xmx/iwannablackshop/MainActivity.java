@@ -44,9 +44,6 @@ public class MainActivity extends BaseNavigationActivity
 
     @Override
     protected void initView(Bundle savedInstanceState) {
-        AVOSCloud.initialize(this, "jg8rpu25f2dTGU4dSWLo96tg-gzGzoHsz", "6NdDmnjpXWSID9LCFzBO3CPj");
-        AVAnalytics.trackAppOpened(getIntent());
-
         setContentView(R.layout.activity_main);
 
         Button addItem = getViewById(R.id.add_item);
@@ -164,9 +161,16 @@ public class MainActivity extends BaseNavigationActivity
     }
 
     private void initItemList() {
+        AVOSCloud.initialize(this, "jg8rpu25f2dTGU4dSWLo96tg-gzGzoHsz", "6NdDmnjpXWSID9LCFzBO3CPj");
+        AVAnalytics.trackAppOpened(getIntent());
+
         mItemList = getViewById(R.id.item_list);
 //        mItemList.setOnItemClickListener(this);
 //        mItemList.setOnItemLongClickListener(this);
+
+        mTitles.add(getString(R.string.default_string));
+        mItemAdapter = new ItemAdapter(getApplicationContext(), mTitles);
+        mItemList.setAdapter(mItemAdapter);
 
         AVQuery<AVObject> query = new AVQuery<>("Item");
         query.whereEqualTo("status", 0);
@@ -174,6 +178,7 @@ public class MainActivity extends BaseNavigationActivity
         query.orderByDescending("pubTimestamp");
         query.findInBackground(new FindCallback<AVObject>() {
             public void done(List<AVObject> avObjects, AVException e) {
+                mTitles.clear();
                 if (e == null) {
                     for (int i = 0; i < avObjects.size(); ++i) {
                         AVObject avObject = avObjects.get(i);
@@ -183,8 +188,8 @@ public class MainActivity extends BaseNavigationActivity
                 } else {
                     filterException(e);
                 }
-                mItemAdapter = new ItemAdapter(getApplicationContext(), mTitles);
-                mItemList.setAdapter(mItemAdapter);
+                mItemAdapter.setTitles(mTitles);
+                
                 loadedFlag = true;
             }
         });
@@ -201,7 +206,7 @@ public class MainActivity extends BaseNavigationActivity
                 public void done(List<AVObject> avObjects, AVException e) {
                     if (e == null) {
                         boolean flag = false;
-                        for (int i = 0; i < avObjects.size(); ++i) {
+                        for (int i = avObjects.size()-1; i >= 0; --i) {
                             AVObject avObject = avObjects.get(i);
                             String s = avObject.get("content").toString();
                             if (!mTitles.contains(s)) {

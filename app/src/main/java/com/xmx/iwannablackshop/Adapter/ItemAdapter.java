@@ -32,7 +32,7 @@ public class ItemAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mTitles.size();
+        return Math.max(mTitles.size(), 1);
     }
 
     @Override
@@ -62,8 +62,7 @@ public class ItemAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        String title = mTitles.get(position);
-        if (title != null) {
+        if (position < mTitles.size()) {
             holder.tv.setText(mTitles.get(position));
             holder.tv.setTextColor(Color.BLACK);
         } else {
