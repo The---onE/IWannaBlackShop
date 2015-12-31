@@ -6,6 +6,8 @@ import android.widget.EditText;
 
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.CountCallback;
 import com.avos.avoscloud.SaveCallback;
 
 /**
@@ -19,30 +21,46 @@ public class AddItemActivity extends BaseActivity {
         getViewById(R.id.add_item_ok).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AVObject post = new AVObject("Item");
-                EditText title = getViewById(R.id.add_item_title);
-                if (!title.getText().toString().equals("")) {
-                    post.put("content", title.getText());
-                } else {
+                final EditText title = getViewById(R.id.add_item_title);
+                if (title.getText().toString().equals("")) {
                     showToast("必须添加标题");
                     return;
                 }
-                EditText tag = getViewById(R.id.add_item_tag);
-                post.put("tag", tag.getText());
-                post.put("status", 0);
-                post.put("pubUser", "XMX");
-                post.put("pubTimestamp", System.currentTimeMillis() / 1000);
-                post.saveInBackground(new SaveCallback() {
-                    @Override
-                    public void done(AVException e) {
+
+                AVQuery<AVObject> query = AVQuery.getQuery("Item");
+                query.whereEqualTo("title", title.getText());
+                query.countInBackground(new CountCallback() {
+                    public void done(int count, AVException e) {
                         if (e == null) {
-                            showToast("添加分类成功");
-                            finish();
+                            if (count > 0) {
+                                showToast("已经添加过该分类");
+                            } else {
+                                AVObject post = new AVObject("Item");
+
+                                EditText tag = getViewById(R.id.add_item_tag);
+                                post.put("title", title.getText());
+                                post.put("tag", tag.getText());
+                                post.put("status", 0);
+                                post.put("pubUser", "XMX");
+                                post.put("pubTimestamp", System.currentTimeMillis() / 1000);
+                                post.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(AVException e) {
+                                        if (e == null) {
+                                            showToast("添加分类成功");
+                                            finish();
+                                        } else {
+                                            filterException(e);
+                                        }
+                                    }
+                                });
+                            }
                         } else {
                             filterException(e);
                         }
                     }
                 });
+
             }
         });
 

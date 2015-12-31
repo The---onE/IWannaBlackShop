@@ -182,7 +182,7 @@ public class MainActivity extends BaseNavigationActivity
                 if (e == null) {
                     for (int i = 0; i < avObjects.size(); ++i) {
                         AVObject avObject = avObjects.get(i);
-                        String s = avObject.get("content").toString();
+                        String s = avObject.get("title").toString();
                         mTitles.add(s);
                     }
                 } else {
@@ -208,7 +208,7 @@ public class MainActivity extends BaseNavigationActivity
                         boolean flag = false;
                         for (int i = avObjects.size()-1; i >= 0; --i) {
                             AVObject avObject = avObjects.get(i);
-                            String s = avObject.get("content").toString();
+                            String s = avObject.get("title").toString();
                             if (!mTitles.contains(s)) {
                                 mTitles.add(0, s);
                                 flag = true;
@@ -246,7 +246,7 @@ public class MainActivity extends BaseNavigationActivity
                             boolean flag = false;
                             for (int i = 0; i < avObjects.size(); ++i) {
                                 AVObject avObject = avObjects.get(i);
-                                String s = avObject.get("content").toString();
+                                String s = avObject.get("title").toString();
                                 if (!mTitles.contains(s)) {
                                     mTitles.add(s);
                                     flag = true;
