@@ -13,10 +13,10 @@ import com.avos.avoscloud.SaveCallback;
 /**
  * Created by The_onE on 2015/12/28.
  */
-public class AddItemActivity extends BaseActivity {
+public class AddItemActivity extends BaseTempActivity {
     @Override
     protected void initView(Bundle savedInstanceState) {
-        setContentView(R.layout.add_item_main);
+        setContentView(R.layout.activity_additem);
 
         getViewById(R.id.add_item_ok).setOnClickListener(new View.OnClickListener() {
             @Override
