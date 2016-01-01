@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -80,6 +81,14 @@ public abstract class BaseActivity extends AppCompatActivity {
         Toast.makeText(this, resId, Toast.LENGTH_SHORT).show();
     }
 
+
+    protected void showLog(String tag, String msg) {
+        Log.e(tag, msg);
+    }
+
+    protected void showLog(String tag, int i) {
+        Log.e(tag, ""+i);
+    }
 
     protected void startActivity(Class<?> cls) {
         Intent intent = new Intent(this, cls);

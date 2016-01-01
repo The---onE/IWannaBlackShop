@@ -34,7 +34,7 @@ public class MainActivity extends BaseNavigationActivity
     ItemAdapter mItemAdapter;
     boolean loadedFlag = false;
     boolean allFlag = false;
-    ArrayList<String> mTitles = new ArrayList<>();
+    ArrayList<Item> mItems = new ArrayList<>();
 
     @Override
     protected void onResume() {
@@ -54,7 +54,6 @@ public class MainActivity extends BaseNavigationActivity
             }
         });
 
-        initRefreshLayout();
         initItemList();
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -160,37 +159,79 @@ public class MainActivity extends BaseNavigationActivity
         // 可选配置  -------------END
     }
 
+    private Item createItem(AVObject avObject) {
+        String id = avObject.getObjectId();
+        String title = avObject.get("title").toString();
+        String tag = avObject.get("tag").toString();
+        return new Item(id, title, tag);
+    }
+
+    private AVQuery<AVObject> createQuery(boolean loadFlag) {
+        AVQuery<AVObject> query = new AVQuery<>("Item");
+        query.whereEqualTo("status", 0);
+        if (loadFlag) {
+            query.setSkip(mItems.size());
+        }
+        query.limit(LOAD_LIMIT);
+        query.orderByDescending("pubTimestamp");
+
+        return query;
+    }
+
     private void initItemList() {
         AVOSCloud.initialize(this, "jg8rpu25f2dTGU4dSWLo96tg-gzGzoHsz", "6NdDmnjpXWSID9LCFzBO3CPj");
         AVAnalytics.trackAppOpened(getIntent());
 
         mItemList = getViewById(R.id.item_list);
-//        mItemList.setOnItemClickListener(this);
-//        mItemList.setOnItemLongClickListener(this);
 
-        mTitles.add(getString(R.string.default_string));
-        mItemAdapter = new ItemAdapter(getApplicationContext(), mTitles);
+        initRefreshLayout();
+
+        mItems.add(new Item("", getString(R.string.default_string)));
+        mItemAdapter = new ItemAdapter(getApplicationContext(), mItems);
         mItemList.setAdapter(mItemAdapter);
 
-        AVQuery<AVObject> query = new AVQuery<>("Item");
-        query.whereEqualTo("status", 0);
-        query.limit(LOAD_LIMIT);
-        query.orderByDescending("pubTimestamp");
+        AVQuery<AVObject> query = createQuery(false);
         query.findInBackground(new FindCallback<AVObject>() {
             public void done(List<AVObject> avObjects, AVException e) {
-                mTitles.clear();
+                mItems.clear();
                 if (e == null) {
                     for (int i = 0; i < avObjects.size(); ++i) {
-                        AVObject avObject = avObjects.get(i);
-                        String s = avObject.get("title").toString();
-                        mTitles.add(s);
+                        Item item = createItem(avObjects.get(i));
+                        mItems.add(item);
                     }
                 } else {
                     filterException(e);
                 }
-                mItemAdapter.setTitles(mTitles);
+                mItemAdapter.setItems(mItems);
                 
                 loadedFlag = true;
+            }
+        });
+    }
+
+    private void refresh() {
+        AVQuery<AVObject> query = createQuery(false);
+        query.findInBackground(new FindCallback<AVObject>() {
+            public void done(List<AVObject> avObjects, AVException e) {
+                if (e == null) {
+                    boolean flag = false;
+                    for (int i = avObjects.size()-1; i >= 0; --i) {
+                        Item item = createItem(avObjects.get(i));
+                        if (!mItems.contains(item)) {
+                            mItems.add(0, item);
+                            flag = true;
+                        }
+                    }
+
+                    if (flag) {
+                        mItemAdapter.setItems(mItems);
+                    } else {
+                        showToast("没有更新数据");
+                    }
+                } else {
+                    filterException(e);
+                }
+                mRefreshLayout.endRefreshing();
             }
         });
     }
@@ -198,73 +239,45 @@ public class MainActivity extends BaseNavigationActivity
     @Override
     public void onBGARefreshLayoutBeginRefreshing(BGARefreshLayout bgaRefreshLayout) {
         if (loadedFlag) {
-            AVQuery<AVObject> query = new AVQuery<>("Item");
-            query.whereEqualTo("status", 0);
-            query.limit(LOAD_LIMIT);
-            query.orderByDescending("pubTimestamp");
-            query.findInBackground(new FindCallback<AVObject>() {
-                public void done(List<AVObject> avObjects, AVException e) {
-                    if (e == null) {
-                        boolean flag = false;
-                        for (int i = avObjects.size()-1; i >= 0; --i) {
-                            AVObject avObject = avObjects.get(i);
-                            String s = avObject.get("title").toString();
-                            if (!mTitles.contains(s)) {
-                                mTitles.add(0, s);
-                                flag = true;
-                            }
-                        }
-
-                        if (flag) {
-                            mItemAdapter.setTitles(mTitles);
-                        } else {
-                            showToast("没有更新数据");
-                        }
-                    } else {
-                        filterException(e);
-                    }
-                    mRefreshLayout.endRefreshing();
-                }
-            });
+            refresh();
         } else {
             mRefreshLayout.endRefreshing();
         }
+    }
+
+    private void loadMore() {
+        AVQuery<AVObject> query = createQuery(true);
+        query.findInBackground(new FindCallback<AVObject>() {
+            public void done(List<AVObject> avObjects, AVException e) {
+                if (e == null) {
+                    boolean flag = false;
+                    for (int i = 0; i < avObjects.size(); ++i) {
+                        Item item = createItem(avObjects.get(i));
+                        if (!mItems.contains(item)) {
+                            mItems.add(item);
+                            flag = true;
+                        }
+                    }
+
+                    if (flag) {
+                        mItemAdapter.setItems(mItems);
+                    } else {
+                        allFlag = true;
+                        showToast("已加载全部");
+                    }
+                } else {
+                    filterException(e);
+                }
+                mRefreshLayout.endLoadingMore();
+            }
+        });
     }
 
     @Override
     public boolean onBGARefreshLayoutBeginLoadingMore(BGARefreshLayout bgaRefreshLayout) {
         if (loadedFlag) {
             if (!allFlag) {
-                AVQuery<AVObject> query = new AVQuery<>("Item");
-                query.whereEqualTo("status", 0);
-                query.setSkip(mTitles.size());
-                query.limit(LOAD_LIMIT);
-                query.orderByDescending("pubTimestamp");
-                query.findInBackground(new FindCallback<AVObject>() {
-                    public void done(List<AVObject> avObjects, AVException e) {
-                        if (e == null) {
-                            boolean flag = false;
-                            for (int i = 0; i < avObjects.size(); ++i) {
-                                AVObject avObject = avObjects.get(i);
-                                String s = avObject.get("title").toString();
-                                if (!mTitles.contains(s)) {
-                                    mTitles.add(s);
-                                    flag = true;
-                                }
-                            }
-
-                            if (flag) {
-                                mItemAdapter.setTitles(mTitles);
-                            } else {
-                                allFlag = true;
-                                showToast("已加载全部");
-                            }
-                        } else {
-                            filterException(e);
-                        }
-                        mRefreshLayout.endLoadingMore();
-                    }
-                });
+                loadMore();
                 return true;
             } else {
                 showToast("已加载全部");

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.xmx.iwannablackshop.Item;
 import com.xmx.iwannablackshop.R;
 
 import java.util.ArrayList;
@@ -17,27 +18,27 @@ import java.util.ArrayList;
  */
 public class ItemAdapter extends BaseAdapter {
 
-    ArrayList<String> mTitles = new ArrayList<>();
+    ArrayList<Item> mItems = new ArrayList<>();
     Context mContext;
 
-    public ItemAdapter(Context context, ArrayList<String> titles) {
+    public ItemAdapter(Context context, ArrayList<Item> items) {
         mContext = context;
-        mTitles = titles;
+        mItems = items;
     }
 
-    public void setTitles(ArrayList<String> titles) {
-        mTitles = titles;
+    public void setItems(ArrayList<Item> items) {
+        mItems = items;
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return Math.max(mTitles.size(), 1);
+        return Math.max(mItems.size(), 1);
     }
 
     @Override
     public Object getItem(int position) {
-        return mTitles.get(position);
+        return mItems.get(position);
     }
 
     @Override
@@ -46,7 +47,8 @@ public class ItemAdapter extends BaseAdapter {
     }
 
     static class ViewHolder {
-        TextView tv;
+        TextView title;
+        TextView tag;
     }
 
     @Override
@@ -56,17 +58,20 @@ public class ItemAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.item_item, null);
             holder = new ViewHolder();
-            holder.tv = (TextView) convertView.findViewById(R.id.item_title);
+            holder.title = (TextView) convertView.findViewById(R.id.item_title);
+            holder.tag = (TextView) convertView.findViewById(R.id.item_tag);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        if (position < mTitles.size()) {
-            holder.tv.setText(mTitles.get(position));
-            holder.tv.setTextColor(Color.BLACK);
+        if (position < mItems.size()) {
+            holder.title.setText(mItems.get(position).getTitle());
+            holder.title.setTextColor(Color.BLACK);
+            holder.tag.setText(mItems.get(position).getTag());
         } else {
-            holder.tv.setText("加载失败");
+            holder.title.setText("加载失败");
+            holder.tag.setText("");
         }
         return convertView;
     }
