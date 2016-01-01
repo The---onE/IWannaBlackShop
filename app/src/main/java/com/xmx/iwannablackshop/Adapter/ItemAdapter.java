@@ -38,7 +38,11 @@ public class ItemAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return mItems.get(position);
+        if (position < mItems.size()) {
+            return mItems.get(position);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -54,7 +58,6 @@ public class ItemAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         final ViewHolder holder;
-        final int p = position;
         if (convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.item_item, null);
             holder = new ViewHolder();

@@ -4,7 +4,7 @@ package com.xmx.iwannablackshop;
  * Created by The_onE on 2016/1/1.
  */
 public class Item {
-    String id = "";
+    String id = null;
     String title = "";
     String tag = "";
 

@@ -25,9 +25,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         initView(savedInstanceState);
         setListener();
         processLogic(savedInstanceState);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
     }
 
     protected <VT extends View> VT getViewById(@IdRes int id) {
@@ -39,6 +36,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected abstract void setListener();
 
     protected abstract void processLogic(Bundle savedInstanceState);
+
     @Override
     public void setContentView(int layoutResID) {
         super.setContentView(layoutResID);
@@ -87,7 +85,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void showLog(String tag, int i) {
-        Log.e(tag, ""+i);
+        Log.e(tag, "" + i);
     }
 
     protected void startActivity(Class<?> cls) {

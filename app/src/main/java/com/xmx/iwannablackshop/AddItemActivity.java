@@ -17,7 +17,10 @@ public class AddItemActivity extends BaseTempActivity {
     @Override
     protected void initView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_additem);
+    }
 
+    @Override
+    protected void setListener() {
         getViewById(R.id.add_item_ok).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,11 +73,6 @@ public class AddItemActivity extends BaseTempActivity {
                 finish();
             }
         });
-    }
-
-    @Override
-    protected void setListener() {
-
     }
 
     @Override

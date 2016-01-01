@@ -6,6 +6,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -68,7 +69,15 @@ public class MainActivity extends BaseNavigationActivity
 
     @Override
     protected void setListener() {
-
+        mItemList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Item item = (Item) parent.getItemAtPosition(position);
+                if (item != null && item.getId() != null) {
+                    startActivity(SelectRoomActivity.class, "id", item.getId());
+                }
+            }
+        });
     }
 
     @Override
@@ -186,7 +195,7 @@ public class MainActivity extends BaseNavigationActivity
 
         initRefreshLayout();
 
-        mItems.add(new Item("", getString(R.string.default_string)));
+        mItems.add(new Item(null, getString(R.string.default_string)));
         mItemAdapter = new ItemAdapter(getApplicationContext(), mItems);
         mItemList.setAdapter(mItemAdapter);
 
@@ -203,7 +212,7 @@ public class MainActivity extends BaseNavigationActivity
                     filterException(e);
                 }
                 mItemAdapter.setItems(mItems);
-                
+
                 loadedFlag = true;
             }
         });
@@ -215,7 +224,7 @@ public class MainActivity extends BaseNavigationActivity
             public void done(List<AVObject> avObjects, AVException e) {
                 if (e == null) {
                     boolean flag = false;
-                    for (int i = avObjects.size()-1; i >= 0; --i) {
+                    for (int i = avObjects.size() - 1; i >= 0; --i) {
                         Item item = createItem(avObjects.get(i));
                         if (!mItems.contains(item)) {
                             mItems.add(0, item);
