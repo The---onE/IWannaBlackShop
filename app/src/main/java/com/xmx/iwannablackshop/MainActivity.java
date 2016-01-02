@@ -37,6 +37,9 @@ public class MainActivity extends BaseNavigationActivity
     boolean allFlag = false;
     ArrayList<Item> mItems = new ArrayList<>();
 
+    private long exitTime = 0;
+    static long LONGEST_EXIT_TIME = 2000;
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -91,7 +94,12 @@ public class MainActivity extends BaseNavigationActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if ((System.currentTimeMillis() - exitTime) > LONGEST_EXIT_TIME) {
+                showToast(R.string.confirm_exit);
+                exitTime = System.currentTimeMillis();
+            } else {
+                super.onBackPressed();
+            }
         }
     }
 
