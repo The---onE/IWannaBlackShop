@@ -2,12 +2,30 @@ package com.xmx.iwannablackshop;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 
 /**
  * Created by The_onE on 2016/1/1.
  */
 public abstract class BaseTempActivity extends BaseActivity {
+    GestureDetector mGestureDetector;
+
+    class TempOnGestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            if (velocityX > Math.abs(velocityY)) {
+                onBackPressed();
+            }
+            return super.onFling(e1, e2, velocityX, velocityY);
+        }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return mGestureDetector.onTouchEvent(event);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,5 +41,7 @@ public abstract class BaseTempActivity extends BaseActivity {
                 onBackPressed();
             }
         });
+
+        mGestureDetector = new GestureDetector(this, new TempOnGestureListener());
     }
 }
