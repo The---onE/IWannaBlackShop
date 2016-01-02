@@ -2,13 +2,14 @@ package com.xmx.iwannablackshop;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.Button;
 
-import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.AVQuery;
-import com.avos.avoscloud.GetCallback;
+import com.xmx.iwannablackshop.Chat.ChatroomActivity;
 
 public class SelectRoomActivity extends BaseNavigationActivity {
+    String id;
+    String title;
 
     @Override
     protected void initView(Bundle savedInstanceState) {
@@ -17,9 +18,10 @@ public class SelectRoomActivity extends BaseNavigationActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        String id = getIntent().getStringExtra("id");
+        id = getIntent().getStringExtra("id");
+        title = getIntent().getStringExtra("title");
 
-        AVQuery<AVObject> query = new AVQuery<AVObject>("Item");
+        /*AVQuery<AVObject> query = new AVQuery<>("Item");
         query.getInBackground(id, new GetCallback<AVObject>() {
             public void done(AVObject post, AVException e) {
                 if (e == null) {
@@ -28,12 +30,22 @@ public class SelectRoomActivity extends BaseNavigationActivity {
                     filterException(e);
                 }
             }
-        });
+        });*/
+
+        getSupportActionBar().setTitle(title);
     }
 
     @Override
     protected void setListener() {
-
+        Button chatroom = getViewById(R.id.chatroom_button);
+        chatroom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(ChatroomActivity.class,
+                        "id", id,
+                        "title", title);
+            }
+        });
     }
 
     @Override

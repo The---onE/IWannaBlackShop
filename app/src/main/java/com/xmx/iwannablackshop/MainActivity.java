@@ -77,7 +77,9 @@ public class MainActivity extends BaseNavigationActivity
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Item item = (Item) parent.getItemAtPosition(position);
                 if (item != null && item.getId() != null) {
-                    startActivity(SelectRoomActivity.class, "id", item.getId());
+                    startActivity(SelectRoomActivity.class,
+                            "id", item.getId(),
+                            "title", item.getTitle());
                 }
             }
         });

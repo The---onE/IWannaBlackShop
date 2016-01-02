@@ -28,6 +28,9 @@
         <activity
             android:name=".SelectRoomActivity"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Chat.ChatroomActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>
