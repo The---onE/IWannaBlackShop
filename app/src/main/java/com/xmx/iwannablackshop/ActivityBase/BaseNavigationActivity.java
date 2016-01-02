@@ -1,4 +1,4 @@
-package com.xmx.iwannablackshop;
+package com.xmx.iwannablackshop.ActivityBase;
 
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -7,6 +7,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+
+import com.xmx.iwannablackshop.ActivityBase.BaseActivity;
+import com.xmx.iwannablackshop.R;
 
 /**
  * Created by The_onE on 2015/12/28.

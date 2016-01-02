@@ -1,4 +1,4 @@
-package com.xmx.iwannablackshop;
+package com.xmx.iwannablackshop.Item;
 
 /**
  * Created by The_onE on 2016/1/1.
@@ -8,12 +8,12 @@ public class Item {
     String title = "";
     String tag = "";
 
-    Item(String i, String ti) {
+    public Item(String i, String ti) {
         id = i;
         title = ti;
     }
 
-    Item(String i, String ti, String ta) {
+    public Item(String i, String ti, String ta) {
         id = i;
         title = ti;
         tag = ta;

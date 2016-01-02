@@ -1,4 +1,4 @@
-package com.xmx.iwannablackshop;
+package com.xmx.iwannablackshop.Item;
 
 import android.os.Bundle;
 import android.view.View;
@@ -9,6 +9,8 @@ import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.CountCallback;
 import com.avos.avoscloud.SaveCallback;
+import com.xmx.iwannablackshop.ActivityBase.BaseTempActivity;
+import com.xmx.iwannablackshop.R;
 
 /**
  * Created by The_onE on 2015/12/28.

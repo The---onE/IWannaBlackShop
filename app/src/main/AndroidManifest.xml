@@ -22,11 +22,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".AddItemActivity"
+            android:name=".Item.AddItemActivity"
             android:label="@string/add_item"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".SelectRoomActivity"
+            android:name=".Item.SelectRoomActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Chat.ChatroomActivity"

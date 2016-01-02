@@ -1,4 +1,4 @@
-package com.xmx.iwannablackshop.Adapter;
+package com.xmx.iwannablackshop.Item;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.xmx.iwannablackshop.Item;
 import com.xmx.iwannablackshop.R;
 
 import java.util.ArrayList;

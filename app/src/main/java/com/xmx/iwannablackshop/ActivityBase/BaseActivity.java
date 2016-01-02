@@ -1,4 +1,4 @@
-package com.xmx.iwannablackshop;
+package com.xmx.iwannablackshop.ActivityBase;
 
 import android.content.Intent;
 import android.os.Bundle;

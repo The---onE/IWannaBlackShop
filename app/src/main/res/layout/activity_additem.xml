@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:orientation="vertical"
-    tools:context="com.xmx.iwannablackshop.AddItemActivity">
+    tools:context=".Item.AddItemActivity">
 
     <include layout="@layout/tool_bar" />
 
