@@ -1,5 +1,6 @@
 package com.xmx.iwannablackshop.Item;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -42,11 +43,14 @@ public class AddItemActivity extends BaseTempActivity {
                             } else {
                                 AVObject post = new AVObject("Item");
 
+
+                                String selfId = getSharedPreferences("MEMBER", Context.MODE_PRIVATE).getString("self", "XMX");
+
                                 EditText tag = getViewById(R.id.add_item_tag);
                                 post.put("title", title.getText());
                                 post.put("tag", tag.getText());
                                 post.put("status", 0);
-                                post.put("pubUser", "XMX");
+                                post.put("pubUser", selfId);
                                 post.put("pubTimestamp", System.currentTimeMillis() / 1000);
                                 post.saveInBackground(new SaveCallback() {
                                     @Override

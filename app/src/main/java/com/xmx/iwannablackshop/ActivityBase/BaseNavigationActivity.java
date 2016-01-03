@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import com.xmx.iwannablackshop.ActivityBase.BaseActivity;
+import com.xmx.iwannablackshop.LoginActivity;
 import com.xmx.iwannablackshop.R;
 
 /**
@@ -52,7 +53,7 @@ public abstract class BaseNavigationActivity extends BaseActivity
         } else if (id == R.id.nav_slideshow) {
             showToast("Press Nav_slideshow");
         } else if (id == R.id.nav_manage) {
-            showToast("Press Nav_manage");
+            startActivity(LoginActivity.class);
         } else if (id == R.id.nav_share) {
             showToast("Press Nav_share");
         } else if (id == R.id.nav_send) {

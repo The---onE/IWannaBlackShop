@@ -11,8 +11,6 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.avos.avoscloud.AVException;
-import com.avos.avoscloud.AVOSCloud;
-import com.avos.avoscloud.AVAnalytics;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.FindCallback;
@@ -54,14 +52,6 @@ public class MainActivity extends BaseNavigationActivity
     protected void initView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_main);
 
-        Button addItem = getViewById(R.id.add_item);
-        addItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(AddItemActivity.class);
-            }
-        });
-
         initItemList();
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -76,6 +66,14 @@ public class MainActivity extends BaseNavigationActivity
 
     @Override
     protected void setListener() {
+        Button addItem = getViewById(R.id.add_item);
+        addItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(AddItemActivity.class);
+            }
+        });
+
         mItemList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -91,7 +89,6 @@ public class MainActivity extends BaseNavigationActivity
 
     @Override
     protected void processLogic(Bundle savedInstanceState) {
-
     }
 
     @Override
@@ -129,31 +126,6 @@ public class MainActivity extends BaseNavigationActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            showToast("Press Camera");
-        } else if (id == R.id.nav_gallery) {
-            showToast("Press Gallery");
-        } else if (id == R.id.nav_slideshow) {
-            showToast("Press Nav_slideshow");
-        } else if (id == R.id.nav_manage) {
-            showToast("Press Nav_manage");
-        } else if (id == R.id.nav_share) {
-            showToast("Press Nav_share");
-        } else if (id == R.id.nav_send) {
-            showToast("Press Nav_send");
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     private void initRefreshLayout() {
@@ -202,9 +174,6 @@ public class MainActivity extends BaseNavigationActivity
     }
 
     private void initItemList() {
-        AVOSCloud.initialize(this, "jg8rpu25f2dTGU4dSWLo96tg-gzGzoHsz", "6NdDmnjpXWSID9LCFzBO3CPj");
-        AVAnalytics.trackAppOpened(getIntent());
-
         mItemList = getViewById(R.id.item_list);
 
         initRefreshLayout();

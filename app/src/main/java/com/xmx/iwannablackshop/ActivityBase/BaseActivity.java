@@ -4,13 +4,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.xmx.iwannablackshop.Chat.Event.EmptyEvent;
+
 import butterknife.ButterKnife;
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by The_onE on 2015/12/27.
@@ -58,6 +60,18 @@ public abstract class BaseActivity extends AppCompatActivity {
         onViewCreated();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        EventBus.getDefault().unregister(this);
+    }
+
     protected void onViewCreated() {
     }
 
@@ -100,4 +114,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         }
         startActivity(intent);
     }
+
+    public void onEvent(EmptyEvent event) {}
 }
