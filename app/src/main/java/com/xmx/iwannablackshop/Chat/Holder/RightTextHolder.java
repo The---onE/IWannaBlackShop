@@ -63,9 +63,10 @@ public class RightTextHolder extends AVCommonViewHolder {
     String time = dateFormat.format(message.getTimestamp());
 
     String content = getContext().getString(R.string.unsupported_message_type);;
-    if (message instanceof AVIMTextMessage) {
-      content = ((AVIMTextMessage)message).getText();
-    }
+    //if (message instanceof AVIMTextMessage) {
+    //  content = ((AVIMTextMessage)message).getText();
+    //}
+    content = message.getContent();
 
     contentView.setText(content);
     timeView.setText(time);
