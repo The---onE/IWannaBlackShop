@@ -18,6 +18,7 @@ import com.avos.avoscloud.im.v2.AVIMMessage;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMMessagesQueryCallback;
 import com.avos.avoscloud.im.v2.messages.AVIMTextMessage;
+import com.xmx.iwannablackshop.Chat.Event.ImMessageEvent;
 import com.xmx.iwannablackshop.Chat.Event.ImTypeMessageEvent;
 import com.xmx.iwannablackshop.Chat.Event.ImTypeMessageResendEvent;
 import com.xmx.iwannablackshop.Chat.Event.InputBottomBarTextEvent;
@@ -63,21 +64,21 @@ public class ChatFragment extends Fragment {
     refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
       @Override
       public void onRefresh() {
-          AVIMMessage message = itemAdapter.getFirstMessage();
-          imConversation.queryMessages(message.getMessageId(), message.getTimestamp(), 20, new AVIMMessagesQueryCallback() {
-            @Override
-            public void done(List<AVIMMessage> list, AVIMException e) {
-              refreshLayout.setRefreshing(false);
-              if (filterException(e)) {
-                if (null != list && list.size() > 0) {
-                  itemAdapter.addMessageList(list);
-                  itemAdapter.notifyDataSetChanged();
+        AVIMMessage message = itemAdapter.getFirstMessage();
+        imConversation.queryMessages(message.getMessageId(), message.getTimestamp(), 20, new AVIMMessagesQueryCallback() {
+          @Override
+          public void done(List<AVIMMessage> list, AVIMException e) {
+            refreshLayout.setRefreshing(false);
+            if (filterException(e)) {
+              if (null != list && list.size() > 0) {
+                itemAdapter.addMessageList(list);
+                itemAdapter.notifyDataSetChanged();
 
-                  layoutManager.scrollToPositionWithOffset(list.size() - 1, 0);
-                }
+                layoutManager.scrollToPositionWithOffset(list.size() - 1, 0);
               }
             }
-          });
+          }
+        });
       }
     });
   }
@@ -138,8 +139,8 @@ public class ChatFragment extends Fragment {
       if (!TextUtils.isEmpty(textEvent.sendContent) && imConversation.getConversationId().equals(textEvent.tag)) {
         //AVIMTextMessage message = new AVIMTextMessage();
         //message.setText(textEvent.sendContent);
-        AVIMTextMessage message = new AVIMTextMessage();
-        message.setText(textEvent.sendContent);
+        AVIMMessage message = new AVIMMessage();
+        message.setContent(textEvent.sendContent);
         itemAdapter.addMessage(message);
         itemAdapter.notifyDataSetChanged();
         scrollToBottom();
@@ -160,6 +161,15 @@ public class ChatFragment extends Fragment {
   public void onEvent(ImTypeMessageEvent event) {
     if (null != imConversation && null != event &&
       imConversation.getConversationId().equals(event.conversation.getConversationId())) {
+      itemAdapter.addMessage(event.message);
+      itemAdapter.notifyDataSetChanged();
+      scrollToBottom();
+    }
+  }
+
+  public void onEvent(ImMessageEvent event) {
+    if (null != imConversation && null != event &&
+            imConversation.getConversationId().equals(event.conversation.getConversationId())) {
       itemAdapter.addMessage(event.message);
       itemAdapter.notifyDataSetChanged();
       scrollToBottom();

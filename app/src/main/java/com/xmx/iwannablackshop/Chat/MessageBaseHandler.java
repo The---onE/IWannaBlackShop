@@ -23,7 +23,7 @@ public class MessageBaseHandler extends AVIMMessageHandler {
 
     @Override
     public void onMessage(AVIMMessage message, AVIMConversation conversation, AVIMClient client) {
-        String clientID = "";
+        String clientID;
         try {
             clientID = AVImClientManager.getInstance().getClientId();
             if (client.getClientId().equals(clientID)) {
