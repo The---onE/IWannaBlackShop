@@ -24,7 +24,7 @@ public class NotificationUtils {
    * tag list，用来标记是否应该展示 Notification
    * 比如已经在聊天页面了，实际就不应该再弹出 notification
    */
-  private static List<String> notificationTagList = new LinkedList<String>();
+  private static List<String> notificationTagList = new LinkedList<>();
 
   /**
    * 添加 tag 到 tag list，在 MessageHandler 弹出 notification 前会判断是否与此 tag 相等

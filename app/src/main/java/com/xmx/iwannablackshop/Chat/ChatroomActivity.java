@@ -1,11 +1,13 @@
 package com.xmx.iwannablackshop.Chat;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMConversationQuery;
 import com.avos.avoscloud.im.v2.AVIMException;
+import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationCreatedCallback;
 import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
@@ -24,14 +26,9 @@ public class ChatroomActivity extends BaseTempActivity {
     protected void initView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_chatroom);
 
-        final String id = getIntent().getStringExtra("id");
-        final String title = getIntent().getStringExtra("title");
-
+        String title = getIntent().getStringExtra("title");
         setTitle(title);
-
         chatFragment = (ChatFragment) getFragmentManager().findFragmentById(R.id.fragment_chat);
-
-        initSquare(id);
     }
 
     @Override
@@ -41,7 +38,19 @@ public class ChatroomActivity extends BaseTempActivity {
 
     @Override
     protected void processLogic(Bundle savedInstanceState) {
-
+        String selfId = getSharedPreferences("MEMBER", Context.MODE_PRIVATE).getString("self", "XMX");
+        AVImClientManager.getInstance().open(selfId, new AVIMClientCallback() {
+            @Override
+            public void done(AVIMClient avimClient, AVIMException e) {
+                if (e == null) {
+                    String id = getIntent().getStringExtra("id");
+                    initSquare(id);
+                } else {
+                    filterException(e);
+                    showToast("进入失败");
+                }
+            }
+        });
     }
 
     /**
