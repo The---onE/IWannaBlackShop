@@ -5,7 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.GetCallback;
 import com.xmx.iwannablackshop.Item.SelectRoomActivity;
+import com.xmx.iwannablackshop.MainActivity;
 
 /**
  * Created by wli on 15/9/8.
@@ -22,11 +27,11 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
     } else {
       String conversationId = intent.getStringExtra(Constants.CONVERSATION_ID);
       if (!TextUtils.isEmpty(conversationId)) {
-        if ("5688d14860b2a099cdd60397".equals(conversationId)) {
-          gotoSquareActivity(context, intent);
-        } else {
-          gotoSingleChatActivity(context, intent);
-        }
+//        if ("5688d14860b2a099cdd60397".equals(conversationId)) {
+          gotoSquareActivity(context, intent, conversationId);
+//        } else {
+//          gotoSingleChatActivity(context, intent);
+//        }
       }
     }
   }
@@ -36,7 +41,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
    * @param context
    */
   private void gotoLoginActivity(Context context) {
-    Intent startActivityIntent = new Intent(context, SelectRoomActivity.class);
+    Intent startActivityIntent = new Intent(context, MainActivity.class);
     startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
     context.startActivity(startActivityIntent);
   }
@@ -46,11 +51,21 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
    * @param context
    * @param intent
    */
-  private void gotoSquareActivity(Context context, Intent intent) {
-    Intent startActivityIntent = new Intent(context, SelectRoomActivity.class);
-    startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-    startActivityIntent.putExtra(Constants.CONVERSATION_ID, intent.getStringExtra(Constants.CONVERSATION_ID));
-    context.startActivity(startActivityIntent);
+  private void gotoSquareActivity(final Context context, Intent intent, final String id) {
+      AVQuery<AVObject> query = new AVQuery<>("Item");
+      query.getInBackground(id, new GetCallback<AVObject>() {
+          public void done(AVObject post, AVException e) {
+              if (e == null) {
+                  Intent start = new Intent(context, SelectRoomActivity.class);
+                  start.putExtra("id", id);
+                  start.putExtra("title", post.getString("title"));
+                  start.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                  context.startActivity(start);
+              } else {
+                  e.printStackTrace();
+              }
+          }
+      });
   }
 
   /**
@@ -58,10 +73,10 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
    * @param context
    * @param intent
    */
-  private void gotoSingleChatActivity(Context context, Intent intent) {
-    Intent startActivityIntent = new Intent(context, SelectRoomActivity.class);
-    startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    startActivityIntent.putExtra(Constants.MEMBER_ID, intent.getStringExtra(Constants.MEMBER_ID));
-    context.startActivity(startActivityIntent);
-  }
+//  private void gotoSingleChatActivity(Context context, Intent intent) {
+//    Intent startActivityIntent = new Intent(context, SelectRoomActivity.class);
+//    startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//    startActivityIntent.putExtra(Constants.MEMBER_ID, intent.getStringExtra(Constants.MEMBER_ID));
+//    context.startActivity(startActivityIntent);
+//  }
 }
