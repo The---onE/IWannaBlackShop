@@ -115,5 +115,6 @@ public abstract class BaseActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void onEvent(EmptyEvent event) {}
+    public void onEvent(EmptyEvent event) {
+    }
 }

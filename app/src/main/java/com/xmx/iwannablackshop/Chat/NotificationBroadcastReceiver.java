@@ -15,38 +15,40 @@ import com.xmx.iwannablackshop.MainActivity;
  */
 public class NotificationBroadcastReceiver extends BroadcastReceiver {
 
-  @Override
-  public void onReceive(Context context, Intent intent) {
-    if (AVImClientManager.getInstance().getClient() == null) {
-      gotoMainActivity(context);
-    } else {
-      String itemId = intent.getStringExtra("id");
-      if (!TextUtils.isEmpty(itemId)) {
-          gotoChatroomActivity(context, intent);
-      }
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        if (AVImClientManager.getInstance().getClient() == null) {
+            gotoMainActivity(context);
+        } else {
+            String itemId = intent.getStringExtra("id");
+            if (!TextUtils.isEmpty(itemId)) {
+                gotoChatroomActivity(context, intent);
+            }
+        }
     }
-  }
 
-  /**
-   * 如果 app 上下文已经缺失，则跳转到登陆页面，走重新登陆的流程
-   * @param context
-   */
-  private void gotoMainActivity(Context context) {
-    Intent startActivityIntent = new Intent(context, MainActivity.class);
-    startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    context.startActivity(startActivityIntent);
-  }
+    /**
+     * 如果 app 上下文已经缺失，则跳转到登陆页面，走重新登陆的流程
+     *
+     * @param context
+     */
+    private void gotoMainActivity(Context context) {
+        Intent startActivityIntent = new Intent(context, MainActivity.class);
+        startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(startActivityIntent);
+    }
 
-  /**
-   * 跳转至广场页面
-   * @param context
-   * @param intent
-   */
-  private void gotoChatroomActivity(final Context context, final Intent intent) {
-      Intent start = new Intent(context, ChatroomActivity.class);
-      start.putExtra("id", intent.getStringExtra("id"));
-      start.putExtra("title", intent.getStringExtra("title"));
-      start.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-      context.startActivity(start);
-  }
+    /**
+     * 跳转至广场页面
+     *
+     * @param context
+     * @param intent
+     */
+    private void gotoChatroomActivity(final Context context, final Intent intent) {
+        Intent start = new Intent(context, ChatroomActivity.class);
+        start.putExtra("id", intent.getStringExtra("id"));
+        start.putExtra("title", intent.getStringExtra("title"));
+        start.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(start);
+    }
 }

@@ -6,12 +6,12 @@ package com.xmx.iwannablackshop.Chat;
  */
 public class Constants {
 
-  private static final String LEANMESSAGE_CONSTANTS_PREFIX = "com.xmx.iwannablackshop.Chat";
+    private static final String LEANMESSAGE_CONSTANTS_PREFIX = "com.xmx.iwannablackshop.Chat";
 
-  public static final String MEMBER_ID = getPrefixConstant("member_id");
-  public static final String CONVERSATION_ID = getPrefixConstant("conversation_id");
+    public static final String MEMBER_ID = getPrefixConstant("member_id");
+    public static final String CONVERSATION_ID = getPrefixConstant("conversation_id");
 
-  private static String getPrefixConstant(String str) {
-    return LEANMESSAGE_CONSTANTS_PREFIX + str;
-  }
+    private static String getPrefixConstant(String str) {
+        return LEANMESSAGE_CONSTANTS_PREFIX + str;
+    }
 }
