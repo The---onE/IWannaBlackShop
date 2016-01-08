@@ -38,19 +38,24 @@ public class ChatroomActivity extends BaseTempActivity {
 
     @Override
     protected void processLogic(Bundle savedInstanceState) {
-        String selfId = getSharedPreferences("MEMBER", Context.MODE_PRIVATE).getString("self", "XMX");
-        AVImClientManager.getInstance().open(selfId, new AVIMClientCallback() {
-            @Override
-            public void done(AVIMClient avimClient, AVIMException e) {
-                if (e == null) {
-                    String id = getIntent().getStringExtra("id");
-                    initSquare(id);
-                } else {
-                    filterException(e);
-                    showToast("进入失败");
+        if (AVImClientManager.getInstance().getClient() == null) {
+            String selfId = getSharedPreferences("MEMBER", Context.MODE_PRIVATE).getString("self", "XMX");
+            AVImClientManager.getInstance().open(selfId, new AVIMClientCallback() {
+                @Override
+                public void done(AVIMClient avimClient, AVIMException e) {
+                    if (e == null) {
+                        String id = getIntent().getStringExtra("id");
+                        initSquare(id);
+                    } else {
+                        filterException(e);
+                        showToast("进入失败");
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            String id = getIntent().getStringExtra("id");
+            initSquare(id);
+        }
     }
 
     /**

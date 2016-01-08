@@ -1,5 +1,6 @@
 package com.xmx.iwannablackshop;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -14,6 +15,10 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.FindCallback;
+import com.avos.avoscloud.im.v2.AVIMClient;
+import com.avos.avoscloud.im.v2.AVIMException;
+import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
+import com.xmx.iwannablackshop.Chat.AVImClientManager;
 import com.xmx.iwannablackshop.Item.AddItemActivity;
 import com.xmx.iwannablackshop.Item.SelectRoomActivity;
 import com.xmx.iwannablackshop.ActivityBase.BaseNavigationActivity;
@@ -89,6 +94,15 @@ public class MainActivity extends BaseNavigationActivity
 
     @Override
     protected void processLogic(Bundle savedInstanceState) {
+        String selfId = getSharedPreferences("MEMBER", Context.MODE_PRIVATE).getString("self", "XMX");
+        AVImClientManager.getInstance().open(selfId, new AVIMClientCallback() {
+            @Override
+            public void done(AVIMClient avimClient, AVIMException e) {
+                if (e != null) {
+                    filterException(e);
+                }
+            }
+        });
     }
 
     @Override
