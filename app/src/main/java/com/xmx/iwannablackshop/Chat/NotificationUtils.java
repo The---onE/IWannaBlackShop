@@ -55,14 +55,17 @@ public class NotificationUtils {
     return !notificationTagList.contains(tag);
   }
 
-  public static void showNotification(Context context, String title, String content, String sound, Intent intent) {
+  public static void showNotification(Context context, String title, String content,
+                                      String sound, Intent intent) {
     intent.setFlags(0);
-    int notificationId = (new Random()).nextInt();
+    int notificationId = title.hashCode();
     PendingIntent contentIntent = PendingIntent.getBroadcast(context, notificationId, intent, 0);
     NotificationCompat.Builder mBuilder =
       new NotificationCompat.Builder(context)
         .setSmallIcon(R.drawable.chat_notification_icon)
-        .setContentTitle(title).setAutoCancel(true).setContentIntent(contentIntent)
+        .setContentTitle(title)
+        .setAutoCancel(true)
+        .setContentIntent(contentIntent)
         .setDefaults(Notification.DEFAULT_VIBRATE | Notification.DEFAULT_SOUND)
         .setContentText(content);
     NotificationManager manager =

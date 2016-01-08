@@ -3,6 +3,10 @@ package com.xmx.iwannablackshop.Chat;
 import android.content.Context;
 import android.content.Intent;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.GetCallback;
 import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMMessage;
@@ -57,12 +61,25 @@ public class MessageBaseHandler extends AVIMMessageHandler {
         EventBus.getDefault().post(event);
     }
 
-    private void sendNotification(AVIMMessage message, AVIMConversation conversation) {
-        String notificationContent = message.getContent();
+    private void sendNotification(final AVIMMessage message, final AVIMConversation conversation) {
+        final String id = conversation.getName();
 
-        Intent intent = new Intent(context, NotificationBroadcastReceiver.class);
-        intent.putExtra(Constants.CONVERSATION_ID, conversation.getConversationId());
-        intent.putExtra(Constants.MEMBER_ID, message.getFrom());
-        NotificationUtils.showNotification(context, "", notificationContent, null, intent);
+        AVQuery<AVObject> query = new AVQuery<>("Item");
+        query.getInBackground(id, new GetCallback<AVObject>() {
+            public void done(AVObject post, AVException e) {
+                if (e == null) {
+                    String from = message.getFrom();
+                    String content = message.getContent();
+
+                    Intent intent = new Intent(context, NotificationBroadcastReceiver.class);
+                    intent.putExtra("id", id);
+                    intent.putExtra("title", post.getString("title"));
+                    NotificationUtils.showNotification(context, post.getString("title"),
+                            from + " : " + content, null, intent);
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }
