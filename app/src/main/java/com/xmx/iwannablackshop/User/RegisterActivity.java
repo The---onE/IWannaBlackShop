@@ -1,7 +1,5 @@
 package com.xmx.iwannablackshop.User;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -84,9 +82,7 @@ public class RegisterActivity extends BaseTempActivity {
                                             if (e == null) {
                                                 showToast("注册成功");
 
-                                                SharedPreferences sp = getSharedPreferences("USER",
-                                                        Context.MODE_PRIVATE);
-                                                UserManager.saveId(getBaseContext(), post.getObjectId());
+                                                UserManager.setId(getBaseContext(), post.getObjectId());
                                                 UserManager.saveChecksum(getBaseContext(), checksum);
 
                                                 finish();

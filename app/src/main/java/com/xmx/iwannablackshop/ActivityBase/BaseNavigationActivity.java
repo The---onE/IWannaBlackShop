@@ -9,6 +9,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVObject;
+import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.GetCallback;
+import com.avos.avoscloud.SaveCallback;
 import com.xmx.iwannablackshop.Chat.AVImClientManager;
 import com.xmx.iwannablackshop.R;
 import com.xmx.iwannablackshop.LoginActivity;
@@ -96,13 +101,47 @@ public abstract class BaseNavigationActivity extends BaseActivity
     private void checkLoggedIn() {
         NavigationView navigation = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navigation.getMenu();
-        MenuItem login = menu.findItem(R.id.nav_manage);
-        if (UserManager.isLoggedIn(this)) {
-            login.setTitle(UserManager.getNickname(this));
-            loggedinFlag = true;
-        } else {
+        final MenuItem login = menu.findItem(R.id.nav_manage);
+
+        String id = UserManager.getId(this);
+        if (!UserManager.isLoggedIn(this) || id.equals("")) {
             login.setTitle("登录");
             loggedinFlag = false;
+            return;
         }
+
+        AVQuery<AVObject> query = new AVQuery<>("UserInf");
+        query.getInBackground(id, new GetCallback<AVObject>() {
+            @Override
+            public void done(AVObject user, AVException e) {
+                if (e == null) {
+                    String checksum = user.getString("checksum");
+                    if (checksum.equals(UserManager.getSHA(UserManager.getChecksum(getBaseContext())))) {
+                        final String newChecksum = UserManager.makeChecksum();
+                        final String nickname = user.getString("nickname");
+                        user.put("checksum", UserManager.getSHA(newChecksum));
+                        user.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(AVException e) {
+                                if (e == null) {
+                                    login.setTitle(nickname);
+                                    loggedinFlag = true;
+                                    UserManager.saveChecksum(getBaseContext(), newChecksum);
+                                    UserManager.setNickname(getBaseContext(), nickname);
+                                    UserManager.login(getBaseContext());
+                                } else {
+                                    filterException(e);
+                                }
+                            }
+                        });
+                    } else {
+                        logout();
+                        showToast("请重新登录");
+                    }
+                } else {
+                    filterException(e);
+                }
+            }
+        });
     }
 }

@@ -27,6 +27,10 @@ public class LoginActivity extends BaseTempActivity {
         super.onResume();
         AVQuery<AVObject> query = new AVQuery<>("UserInf");
         String id = UserManager.getId(this);
+        if (!UserManager.isLoggedIn(this) || id.equals("")) {
+            return;
+        }
+
         query.getInBackground(id, new GetCallback<AVObject>() {
             @Override
             public void done(AVObject user, AVException e) {
@@ -52,11 +56,11 @@ public class LoginActivity extends BaseTempActivity {
                             }
                         });
                     } else {
+                        UserManager.logout(getBaseContext());
                         showToast("请重新登录");
                     }
                 } else {
-                    //filterException(e);
-                    showToast("请登录");
+                    filterException(e);
                 }
             }
         });
@@ -93,7 +97,7 @@ public class LoginActivity extends BaseTempActivity {
                     public void done(List<AVObject> avObjects, AVException e) {
                         if (e == null) {
                             if (avObjects.size() > 0) {
-                                AVObject user = avObjects.get(0);
+                                final AVObject user = avObjects.get(0);
                                 String rightPassword = user.getString("password");
                                 if (rightPassword.equals(UserManager.getSHA(password))) {
                                     final String newChecksum = UserManager.makeChecksum();
@@ -104,6 +108,7 @@ public class LoginActivity extends BaseTempActivity {
                                         public void done(AVException e) {
                                             if (e == null) {
                                                 showToast("登录成功");
+                                                UserManager.setId(getBaseContext(), user.getObjectId());
                                                 UserManager.saveChecksum(getBaseContext(), newChecksum);
                                                 UserManager.setNickname(getBaseContext(), nickname);
                                                 UserManager.login(getBaseContext());

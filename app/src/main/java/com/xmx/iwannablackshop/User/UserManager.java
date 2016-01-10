@@ -39,7 +39,7 @@ public class UserManager {
         return sp.getString("checksum", "");
     }
 
-    public static void saveId(Context context, String id) {
+    public static void setId(Context context, String id) {
         SharedPreferences sp = context.getSharedPreferences("USER", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
         editor.putString("id", id);
@@ -63,6 +63,7 @@ public class UserManager {
         SharedPreferences.Editor editor = sp.edit();
         editor.putBoolean("loggedin", false);
         editor.putString("checksum", "");
+        editor.putString("nickname", "");
         editor.apply();
     }
 
