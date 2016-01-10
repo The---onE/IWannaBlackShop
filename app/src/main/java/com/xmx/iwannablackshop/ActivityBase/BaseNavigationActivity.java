@@ -16,7 +16,7 @@ import com.avos.avoscloud.GetCallback;
 import com.avos.avoscloud.SaveCallback;
 import com.xmx.iwannablackshop.Chat.AVImClientManager;
 import com.xmx.iwannablackshop.R;
-import com.xmx.iwannablackshop.LoginActivity;
+import com.xmx.iwannablackshop.User.LoginActivity;
 import com.xmx.iwannablackshop.User.UserManager;
 
 /**

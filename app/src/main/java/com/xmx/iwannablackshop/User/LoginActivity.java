@@ -1,4 +1,4 @@
-package com.xmx.iwannablackshop;
+package com.xmx.iwannablackshop.User;
 
 import android.os.Bundle;
 import android.view.View;
@@ -15,8 +15,7 @@ import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
 import com.xmx.iwannablackshop.ActivityBase.BaseTempActivity;
 import com.xmx.iwannablackshop.Chat.AVImClientManager;
-import com.xmx.iwannablackshop.User.RegisterActivity;
-import com.xmx.iwannablackshop.User.UserManager;
+import com.xmx.iwannablackshop.R;
 
 import java.util.List;
 

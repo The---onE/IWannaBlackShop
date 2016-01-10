@@ -43,7 +43,7 @@
             android:name=".Chat.ChatroomActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".User.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".User.RegisterActivity"
             android:theme="@style/AppTheme.NoActionBar" />
