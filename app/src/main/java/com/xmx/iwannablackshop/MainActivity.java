@@ -94,7 +94,8 @@ public class MainActivity extends BaseNavigationActivity
 
     @Override
     protected void processLogic(Bundle savedInstanceState) {
-        String nickname = UserManager.getNickname(this);
+        UserManager.getInstance().setContext(this);
+        String nickname = UserManager.getInstance().getNickname();
         AVImClientManager.getInstance().open(nickname, new AVIMClientCallback() {
             @Override
             public void done(AVIMClient avimClient, AVIMException e) {

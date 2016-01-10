@@ -39,7 +39,7 @@ public class ChatroomActivity extends BaseTempActivity {
     @Override
     protected void processLogic(Bundle savedInstanceState) {
         if (AVImClientManager.getInstance().getClient() == null) {
-            String nickname = UserManager.getNickname(this);
+            String nickname = UserManager.getInstance().getNickname();
             AVImClientManager.getInstance().open(nickname, new AVIMClientCallback() {
                 @Override
                 public void done(AVIMClient avimClient, AVIMException e) {

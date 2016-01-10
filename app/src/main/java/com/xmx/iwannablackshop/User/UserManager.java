@@ -10,6 +10,23 @@ import java.util.Random;
  * Created by The_onE on 2016/1/10.
  */
 public class UserManager {
+    private static UserManager instance;
+
+    Context mContext;
+    SharedPreferences mSP;
+
+    public synchronized static UserManager getInstance() {
+        if (null == instance) {
+            instance = new UserManager();
+        }
+        return instance;
+    }
+
+    public void setContext(Context context) {
+        mContext = context;
+        mSP = context.getSharedPreferences("USER", Context.MODE_PRIVATE);
+    }
+
     public static String getSHA(String s) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -27,61 +44,52 @@ public class UserManager {
         return "" + checksum;
     }
 
-    public static void saveChecksum(Context context, String checksum) {
-        SharedPreferences sp = context.getSharedPreferences("USER", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
+    public void saveChecksum(String checksum) {
+        SharedPreferences.Editor editor = mSP.edit();
         editor.putString("checksum", checksum);
         editor.apply();
     }
 
-    public static String getChecksum(Context context) {
-        SharedPreferences sp = context.getSharedPreferences("USER", Context.MODE_PRIVATE);
-        return sp.getString("checksum", "");
+    public String getChecksum() {
+        return mSP.getString("checksum", "");
     }
 
-    public static void setId(Context context, String id) {
-        SharedPreferences sp = context.getSharedPreferences("USER", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
+    public void setId(String id) {
+        SharedPreferences.Editor editor = mSP.edit();
         editor.putString("id", id);
         editor.apply();
     }
 
-    public static String getId(Context context) {
-        SharedPreferences sp = context.getSharedPreferences("USER", Context.MODE_PRIVATE);
-        return sp.getString("id", "");
+    public String getId() {
+        return mSP.getString("id", "");
     }
 
-    public static void login(Context context) {
-        SharedPreferences sp = context.getSharedPreferences("USER", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
+    public void login() {
+        SharedPreferences.Editor editor = mSP.edit();
         editor.putBoolean("loggedin", true);
         editor.apply();
     }
 
-    public static void logout(Context context) {
-        SharedPreferences sp = context.getSharedPreferences("USER", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
+    public void logout() {
+        SharedPreferences.Editor editor = mSP.edit();
         editor.putBoolean("loggedin", false);
         editor.putString("checksum", "");
         editor.putString("nickname", "");
         editor.apply();
     }
 
-    public static boolean isLoggedIn(Context context) {
-        SharedPreferences sp = context.getSharedPreferences("USER", Context.MODE_PRIVATE);
-        return sp.getBoolean("loggedin", false);
+    public boolean isLoggedIn() {
+        return mSP.getBoolean("loggedin", false);
     }
 
-    public static void setNickname(Context context, String nickname) {
-        SharedPreferences sp = context.getSharedPreferences("USER", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
+    public void setNickname(String nickname) {
+        SharedPreferences.Editor editor = mSP.edit();
         editor.putString("nickname", nickname);
         editor.apply();
     }
 
-    public static String getNickname(Context context) {
-        SharedPreferences sp = context.getSharedPreferences("USER", Context.MODE_PRIVATE);
-        String nickname = sp.getString("nickname", "");
+    public String getNickname() {
+        String nickname = mSP.getString("nickname", "");
         return nickname.equals("") ? "匿名" : nickname;
     }
 }

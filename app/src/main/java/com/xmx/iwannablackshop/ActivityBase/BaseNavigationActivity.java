@@ -89,7 +89,7 @@ public abstract class BaseNavigationActivity extends BaseActivity
     }
 
     private void logout() {
-        UserManager.logout(this);
+        UserManager.getInstance().logout();
         NavigationView navigation = getViewById(R.id.nav_view);
         Menu menu = navigation.getMenu();
         MenuItem login = menu.findItem(R.id.nav_manage);
@@ -103,8 +103,9 @@ public abstract class BaseNavigationActivity extends BaseActivity
         Menu menu = navigation.getMenu();
         final MenuItem login = menu.findItem(R.id.nav_manage);
 
-        String id = UserManager.getId(this);
-        if (!UserManager.isLoggedIn(this) || id.equals("")) {
+        UserManager.getInstance().setContext(this);
+        String id = UserManager.getInstance().getId();
+        if (!UserManager.getInstance().isLoggedIn() || id.equals("")) {
             login.setTitle("登录");
             loggedinFlag = false;
             return;
@@ -116,7 +117,7 @@ public abstract class BaseNavigationActivity extends BaseActivity
             public void done(AVObject user, AVException e) {
                 if (e == null) {
                     String checksum = user.getString("checksum");
-                    if (checksum.equals(UserManager.getSHA(UserManager.getChecksum(getBaseContext())))) {
+                    if (checksum.equals(UserManager.getSHA(UserManager.getInstance().getChecksum()))) {
                         final String newChecksum = UserManager.makeChecksum();
                         final String nickname = user.getString("nickname");
                         user.put("checksum", UserManager.getSHA(newChecksum));
@@ -126,9 +127,9 @@ public abstract class BaseNavigationActivity extends BaseActivity
                                 if (e == null) {
                                     login.setTitle(nickname);
                                     loggedinFlag = true;
-                                    UserManager.saveChecksum(getBaseContext(), newChecksum);
-                                    UserManager.setNickname(getBaseContext(), nickname);
-                                    UserManager.login(getBaseContext());
+                                    UserManager.getInstance().saveChecksum(newChecksum);
+                                    UserManager.getInstance().setNickname(nickname);
+                                    UserManager.getInstance().login();
                                 } else {
                                     filterException(e);
                                 }

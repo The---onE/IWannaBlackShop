@@ -25,8 +25,8 @@ public class LoginActivity extends BaseTempActivity {
     protected void onResume() {
         super.onResume();
         AVQuery<AVObject> query = new AVQuery<>("UserInf");
-        String id = UserManager.getId(this);
-        if (!UserManager.isLoggedIn(this) || id.equals("")) {
+        String id = UserManager.getInstance().getId();
+        if (!UserManager.getInstance().isLoggedIn() || id.equals("")) {
             return;
         }
 
@@ -35,7 +35,7 @@ public class LoginActivity extends BaseTempActivity {
             public void done(AVObject user, AVException e) {
                 if (e == null) {
                     String checksum = user.getString("checksum");
-                    if (checksum.equals(UserManager.getSHA(UserManager.getChecksum(getBaseContext())))) {
+                    if (checksum.equals(UserManager.getSHA(UserManager.getInstance().getChecksum()))) {
                         final String newChecksum = UserManager.makeChecksum();
                         final String nickname = user.getString("nickname");
                         user.put("checksum", UserManager.getSHA(newChecksum));
@@ -44,9 +44,9 @@ public class LoginActivity extends BaseTempActivity {
                             public void done(AVException e) {
                                 if (e == null) {
                                     showToast("登录成功");
-                                    UserManager.saveChecksum(getBaseContext(), newChecksum);
-                                    UserManager.setNickname(getBaseContext(), nickname);
-                                    UserManager.login(getBaseContext());
+                                    UserManager.getInstance().saveChecksum(newChecksum);
+                                    UserManager.getInstance().setNickname(nickname);
+                                    UserManager.getInstance().login();
 
                                     finish();
                                 } else {
@@ -55,7 +55,7 @@ public class LoginActivity extends BaseTempActivity {
                             }
                         });
                     } else {
-                        UserManager.logout(getBaseContext());
+                        UserManager.getInstance().logout();
                         showToast("请重新登录");
                     }
                 } else {
@@ -107,10 +107,10 @@ public class LoginActivity extends BaseTempActivity {
                                         public void done(AVException e) {
                                             if (e == null) {
                                                 showToast("登录成功");
-                                                UserManager.setId(getBaseContext(), user.getObjectId());
-                                                UserManager.saveChecksum(getBaseContext(), newChecksum);
-                                                UserManager.setNickname(getBaseContext(), nickname);
-                                                UserManager.login(getBaseContext());
+                                                UserManager.getInstance().setId(user.getObjectId());
+                                                UserManager.getInstance().saveChecksum(newChecksum);
+                                                UserManager.getInstance().setNickname(nickname);
+                                                UserManager.getInstance().login();
 
                                                 AVImClientManager.getInstance().open(nickname, new AVIMClientCallback() {
                                                     @Override

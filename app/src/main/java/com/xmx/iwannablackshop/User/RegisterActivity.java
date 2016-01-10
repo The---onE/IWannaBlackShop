@@ -82,8 +82,9 @@ public class RegisterActivity extends BaseTempActivity {
                                             if (e == null) {
                                                 showToast("注册成功");
 
-                                                UserManager.setId(getBaseContext(), post.getObjectId());
-                                                UserManager.saveChecksum(getBaseContext(), checksum);
+                                                UserManager.getInstance().setId(post.getObjectId());
+                                                UserManager.getInstance().saveChecksum(checksum);
+                                                UserManager.getInstance().login();
 
                                                 finish();
                                             } else {
