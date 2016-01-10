@@ -3,6 +3,7 @@ package com.xmx.iwannablackshop.Chat;
 import android.text.TextUtils;
 
 import com.avos.avoscloud.im.v2.AVIMClient;
+import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
 
 /**
@@ -29,6 +30,18 @@ public class AVImClientManager {
         this.clientId = clientId;
         avimClient = AVIMClient.getInstance(clientId);
         avimClient.open(callback);
+    }
+
+    public void close() {
+        avimClient = AVIMClient.getInstance(clientId);
+        avimClient.close(new AVIMClientCallback() {
+            @Override
+            public void done(AVIMClient avimClient, AVIMException e) {
+
+            }
+        });
+        avimClient = null;
+        clientId = "匿名";
     }
 
     public AVIMClient getClient() {

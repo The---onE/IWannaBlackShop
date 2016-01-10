@@ -1,6 +1,5 @@
 package com.xmx.iwannablackshop.Chat;
 
-import android.content.Context;
 import android.os.Bundle;
 
 import com.avos.avoscloud.im.v2.AVIMClient;
@@ -14,6 +13,7 @@ import com.avos.avoscloud.im.v2.callback.AVIMConversationQueryCallback;
 import com.xmx.iwannablackshop.ActivityBase.BaseTempActivity;
 import com.xmx.iwannablackshop.Chat.Event.LeftChatItemClickEvent;
 import com.xmx.iwannablackshop.R;
+import com.xmx.iwannablackshop.User.UserManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,8 +39,8 @@ public class ChatroomActivity extends BaseTempActivity {
     @Override
     protected void processLogic(Bundle savedInstanceState) {
         if (AVImClientManager.getInstance().getClient() == null) {
-            String selfId = getSharedPreferences("MEMBER", Context.MODE_PRIVATE).getString("self", "XMX");
-            AVImClientManager.getInstance().open(selfId, new AVIMClientCallback() {
+            String nickname = UserManager.getNickname(this);
+            AVImClientManager.getInstance().open(nickname, new AVIMClientCallback() {
                 @Override
                 public void done(AVIMClient avimClient, AVIMException e) {
                     if (e == null) {

@@ -21,36 +21,50 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <EditText
-            android:id="@+id/login_username"
+            android:id="@+id/register_nickname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/nickname"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/register_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="@string/username"
             android:inputType="text" />
 
         <EditText
-            android:id="@+id/login_password"
+            android:id="@+id/register_password"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:hint="@string/password"
             android:inputType="textPassword" />
 
+        <EditText
+            android:id="@+id/register_password2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="@string/password2"
+            android:inputType="textPassword" />
+
         <LinearLayout
-            android:id="@+id/login_dialog"
+            android:id="@+id/register_dialog"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/login_login"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/login" />
-
-            <Button
-                android:id="@+id/login_register"
+                android:id="@+id/register_register"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/register" />
+
+            <Button
+                android:id="@+id/register_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/cancel" />
 
         </LinearLayout>
     </LinearLayout>

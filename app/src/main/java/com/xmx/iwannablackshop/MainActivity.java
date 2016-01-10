@@ -1,6 +1,5 @@
 package com.xmx.iwannablackshop;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -24,6 +23,7 @@ import com.xmx.iwannablackshop.Item.SelectRoomActivity;
 import com.xmx.iwannablackshop.ActivityBase.BaseNavigationActivity;
 import com.xmx.iwannablackshop.Item.ItemAdapter;
 import com.xmx.iwannablackshop.Item.Item;
+import com.xmx.iwannablackshop.User.UserManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,8 +94,8 @@ public class MainActivity extends BaseNavigationActivity
 
     @Override
     protected void processLogic(Bundle savedInstanceState) {
-        String selfId = getSharedPreferences("MEMBER", Context.MODE_PRIVATE).getString("self", "XMX");
-        AVImClientManager.getInstance().open(selfId, new AVIMClientCallback() {
+        String nickname = UserManager.getNickname(this);
+        AVImClientManager.getInstance().open(nickname, new AVIMClientCallback() {
             @Override
             public void done(AVIMClient avimClient, AVIMException e) {
                 if (e != null) {

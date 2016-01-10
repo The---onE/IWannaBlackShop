@@ -15,7 +15,6 @@
         <service android:name="com.avos.avoscloud.PushService" />
 
         <receiver android:name=".Chat.NotificationBroadcastReceiver" />
-
         <receiver android:name="com.avos.avoscloud.AVBroadcastReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -45,6 +44,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".LoginActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".User.RegisterActivity"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
