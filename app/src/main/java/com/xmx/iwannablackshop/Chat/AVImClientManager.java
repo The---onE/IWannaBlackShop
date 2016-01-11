@@ -15,6 +15,7 @@ public class AVImClientManager {
 
     private AVIMClient avimClient;
     private String clientId;
+    private boolean openFlag = false;
 
     public synchronized static AVImClientManager getInstance() {
         if (null == imClientManager) {
@@ -30,18 +31,22 @@ public class AVImClientManager {
         this.clientId = clientId;
         avimClient = AVIMClient.getInstance(clientId);
         avimClient.open(callback);
+        openFlag = true;
     }
 
     public void close() {
-        avimClient = AVIMClient.getInstance(clientId);
-        avimClient.close(new AVIMClientCallback() {
-            @Override
-            public void done(AVIMClient avimClient, AVIMException e) {
+        if (openFlag) {
+            avimClient = AVIMClient.getInstance(clientId);
+            avimClient.close(new AVIMClientCallback() {
+                @Override
+                public void done(AVIMClient avimClient, AVIMException e) {
 
-            }
-        });
-        avimClient = null;
-        clientId = "匿名";
+                }
+            });
+            openFlag = false;
+            avimClient = null;
+            clientId = "匿名";
+        }
     }
 
     public AVIMClient getClient() {

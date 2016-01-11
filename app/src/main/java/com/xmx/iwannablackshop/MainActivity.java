@@ -14,15 +14,12 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.FindCallback;
-import com.avos.avoscloud.im.v2.AVIMClient;
-import com.avos.avoscloud.im.v2.AVIMException;
-import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
-import com.xmx.iwannablackshop.Chat.AVImClientManager;
 import com.xmx.iwannablackshop.Item.AddItemActivity;
 import com.xmx.iwannablackshop.Item.SelectRoomActivity;
 import com.xmx.iwannablackshop.ActivityBase.BaseNavigationActivity;
 import com.xmx.iwannablackshop.Item.ItemAdapter;
 import com.xmx.iwannablackshop.Item.Item;
+import com.xmx.iwannablackshop.User.AutoLoginCallback;
 import com.xmx.iwannablackshop.User.UserManager;
 
 import java.util.ArrayList;
@@ -95,13 +92,25 @@ public class MainActivity extends BaseNavigationActivity
     @Override
     protected void processLogic(Bundle savedInstanceState) {
         UserManager.getInstance().setContext(this);
-        String nickname = UserManager.getInstance().getNickname();
-        AVImClientManager.getInstance().open(nickname, new AVIMClientCallback() {
+        UserManager.getInstance().autoLogin(new AutoLoginCallback() {
             @Override
-            public void done(AVIMClient avimClient, AVIMException e) {
-                if (e != null) {
-                    filterException(e);
-                }
+            public void success(AVObject user) {
+                showToast("登录成功");
+                checkLoggedIn();
+            }
+
+            @Override
+            public void notLoggedIn() {
+                showToast("请登录");
+            }
+
+            @Override
+            public void errorNetwork() {
+            }
+
+            @Override
+            public void errorChecksum() {
+
             }
         });
     }
@@ -233,7 +242,7 @@ public class MainActivity extends BaseNavigationActivity
                     if (flag) {
                         mItemAdapter.setItems(mItems);
                     } else {
-                        showToast("没有更新数据");
+                        //showToast("没有更新数据");
                     }
                 } else {
                     filterException(e);

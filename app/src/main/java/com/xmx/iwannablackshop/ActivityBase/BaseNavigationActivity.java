@@ -9,13 +9,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.AVQuery;
-import com.avos.avoscloud.GetCallback;
-import com.avos.avoscloud.SaveCallback;
-import com.xmx.iwannablackshop.Chat.AVImClientManager;
 import com.xmx.iwannablackshop.R;
+import com.xmx.iwannablackshop.User.AutoLoginCallback;
 import com.xmx.iwannablackshop.User.LoginActivity;
 import com.xmx.iwannablackshop.User.UserManager;
 
@@ -94,54 +90,41 @@ public abstract class BaseNavigationActivity extends BaseActivity
         Menu menu = navigation.getMenu();
         MenuItem login = menu.findItem(R.id.nav_manage);
         login.setTitle("登录");
-        AVImClientManager.getInstance().close();
         loggedinFlag = false;
     }
 
-    private void checkLoggedIn() {
+    protected void checkLoggedIn() {
         NavigationView navigation = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navigation.getMenu();
         final MenuItem login = menu.findItem(R.id.nav_manage);
 
         UserManager.getInstance().setContext(this);
-        String id = UserManager.getInstance().getId();
-        if (!UserManager.getInstance().isLoggedIn() || id.equals("")) {
-            login.setTitle("登录");
-            loggedinFlag = false;
-            return;
-        }
 
-        AVQuery<AVObject> query = new AVQuery<>("UserInf");
-        query.getInBackground(id, new GetCallback<AVObject>() {
+        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
             @Override
-            public void done(AVObject user, AVException e) {
-                if (e == null) {
-                    String checksum = user.getString("checksum");
-                    if (checksum.equals(UserManager.getSHA(UserManager.getInstance().getChecksum()))) {
-                        final String newChecksum = UserManager.makeChecksum();
-                        final String nickname = user.getString("nickname");
-                        user.put("checksum", UserManager.getSHA(newChecksum));
-                        user.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(AVException e) {
-                                if (e == null) {
-                                    login.setTitle(nickname);
-                                    loggedinFlag = true;
-                                    UserManager.getInstance().saveChecksum(newChecksum);
-                                    UserManager.getInstance().setNickname(nickname);
-                                    UserManager.getInstance().login();
-                                } else {
-                                    filterException(e);
-                                }
-                            }
-                        });
-                    } else {
-                        logout();
-                        showToast("请重新登录");
-                    }
-                } else {
-                    filterException(e);
-                }
+            public void success(AVObject user) {
+                login.setTitle(user.getString("nickname"));
+                loggedinFlag = true;
+            }
+
+            @Override
+            public void notLoggedIn() {
+                login.setTitle("登录");
+                loggedinFlag = false;
+            }
+
+            @Override
+            public void errorNetwork() {
+                showToast("网络连接失败");
+                login.setTitle("登录");
+                loggedinFlag = false;
+            }
+
+            @Override
+            public void errorChecksum() {
+                showToast("请重新登录");
+                login.setTitle("登录");
+                loggedinFlag = false;
             }
         });
     }

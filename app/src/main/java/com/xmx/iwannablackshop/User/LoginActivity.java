@@ -4,65 +4,39 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
-import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
-import com.avos.avoscloud.AVQuery;
-import com.avos.avoscloud.FindCallback;
-import com.avos.avoscloud.GetCallback;
-import com.avos.avoscloud.SaveCallback;
-import com.avos.avoscloud.im.v2.AVIMClient;
-import com.avos.avoscloud.im.v2.AVIMException;
-import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
 import com.xmx.iwannablackshop.ActivityBase.BaseTempActivity;
-import com.xmx.iwannablackshop.Chat.AVImClientManager;
 import com.xmx.iwannablackshop.R;
-
-import java.util.List;
 
 public class LoginActivity extends BaseTempActivity {
 
     @Override
     protected void onResume() {
         super.onResume();
-        AVQuery<AVObject> query = new AVQuery<>("UserInf");
-        String id = UserManager.getInstance().getId();
-        if (!UserManager.getInstance().isLoggedIn() || id.equals("")) {
-            return;
-        }
 
-        query.getInBackground(id, new GetCallback<AVObject>() {
-            @Override
-            public void done(AVObject user, AVException e) {
-                if (e == null) {
-                    String checksum = user.getString("checksum");
-                    if (checksum.equals(UserManager.getSHA(UserManager.getInstance().getChecksum()))) {
-                        final String newChecksum = UserManager.makeChecksum();
-                        final String nickname = user.getString("nickname");
-                        user.put("checksum", UserManager.getSHA(newChecksum));
-                        user.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(AVException e) {
-                                if (e == null) {
-                                    showToast("登录成功");
-                                    UserManager.getInstance().saveChecksum(newChecksum);
-                                    UserManager.getInstance().setNickname(nickname);
-                                    UserManager.getInstance().login();
+        UserManager.getInstance().autoLogin(
+                new AutoLoginCallback() {
+                    @Override
+                    public void success(AVObject user) {
+                        showToast("登录成功");
+                        finish();
+                    }
 
-                                    finish();
-                                } else {
-                                    filterException(e);
-                                }
-                            }
-                        });
-                    } else {
-                        UserManager.getInstance().logout();
+                    @Override
+                    public void notLoggedIn() {
+
+                    }
+
+                    @Override
+                    public void errorNetwork() {
+                        showToast("网络连接失败");
+                    }
+
+                    @Override
+                    public void errorChecksum() {
                         showToast("请重新登录");
                     }
-                } else {
-                    filterException(e);
-                }
-            }
-        });
+                });
     }
 
     @Override
@@ -89,57 +63,29 @@ public class LoginActivity extends BaseTempActivity {
                     return;
                 }
 
-                AVQuery<AVObject> query = new AVQuery<>("UserInf");
-                query.whereEqualTo("username", username);
-                query.findInBackground(new FindCallback<AVObject>() {
-                    @Override
-                    public void done(List<AVObject> avObjects, AVException e) {
-                        if (e == null) {
-                            if (avObjects.size() > 0) {
-                                final AVObject user = avObjects.get(0);
-                                String rightPassword = user.getString("password");
-                                if (rightPassword.equals(UserManager.getSHA(password))) {
-                                    final String newChecksum = UserManager.makeChecksum();
-                                    final String nickname = user.getString("nickname");
-                                    user.put("checksum", UserManager.getSHA(newChecksum));
-                                    user.saveInBackground(new SaveCallback() {
-                                        @Override
-                                        public void done(AVException e) {
-                                            if (e == null) {
-                                                showToast("登录成功");
-                                                UserManager.getInstance().setId(user.getObjectId());
-                                                UserManager.getInstance().saveChecksum(newChecksum);
-                                                UserManager.getInstance().setNickname(nickname);
-                                                UserManager.getInstance().login();
+                UserManager.getInstance().login(username, password,
+                        new LoginCallback() {
+                            @Override
+                            public void success(AVObject user) {
+                                showToast("登录成功");
+                                finish();
+                            }
 
-                                                AVImClientManager.getInstance().open(nickname, new AVIMClientCallback() {
-                                                    @Override
-                                                    public void done(AVIMClient avimClient, AVIMException e) {
-                                                        if (e != null) {
-                                                            filterException(e);
-                                                        }
-                                                    }
-                                                });
+                            @Override
+                            public void errorNetwork() {
+                                showToast("网络连接失败");
+                            }
 
-                                                finish();
-                                            } else {
-                                                filterException(e);
-                                            }
-                                        }
-                                    });
-                                } else {
-                                    showToast("密码错误");
-                                }
-
-                            } else {
+                            @Override
+                            public void errorUsername() {
                                 showToast("用户不存在");
                             }
-                        } else {
-                            filterException(e);
-                            //showToast("请登录");
-                        }
-                    }
-                });
+
+                            @Override
+                            public void errorPassword() {
+                                showToast("密码错误");
+                            }
+                        });
             }
         });
 
