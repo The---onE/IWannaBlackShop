@@ -51,49 +51,60 @@ public class RegisterActivity extends BaseTempActivity {
                     return;
                 }
 
-                AVQuery<AVObject> query = AVQuery.getQuery("UserInf");
+                final AVQuery<AVObject> query = AVQuery.getQuery("UserInf");
                 query.whereEqualTo("username", username);
                 query.countInBackground(new CountCallback() {
-                    public void done(int count, AVException e) {
+                    public void done(final int count, AVException e) {
                         if (e == null) {
                             if (count > 0) {
                                 showToast("该用户名已被注册");
                             } else {
-                                try {
-                                    final AVObject post = new AVObject("UserInf");
-
-                                    post.put("username", username);
-                                    post.put("password", UserManager.getSHA(password));
-                                    post.put("nickname", nickname);
-                                    post.put("status", 0);
-                                    post.put("timestamp", System.currentTimeMillis() / 1000);
-
-                                    final String checksum = UserManager.makeChecksum();
-                                    post.put("checksum", UserManager.getSHA(checksum));
-
-                                    AVACL acl = new AVACL();
-                                    acl.setPublicReadAccess(true);
-                                    acl.setPublicWriteAccess(true);
-                                    post.setACL(acl);
-
-                                    post.saveInBackground(new SaveCallback() {
-                                        @Override
-                                        public void done(AVException e) {
-                                            if (e == null) {
-                                                showToast("注册成功");
-
-                                                UserManager.getInstance().setUsername(username);
-                                                UserManager.getInstance().login(post.getObjectId(), checksum, nickname);
-
-                                                finish();
+                                AVQuery<AVObject> query2 = AVQuery.getQuery("UserInf");
+                                query2.whereEqualTo("nickname", nickname);
+                                query2.countInBackground(new CountCallback() {
+                                    @Override
+                                    public void done(int i, AVException e) {
+                                        if (e == null) {
+                                            if (i > 0) {
+                                                showToast("该昵称已被注册");
                                             } else {
-                                                filterException(e);
+                                                final AVObject post = new AVObject("UserInf");
+
+                                                post.put("username", username);
+                                                post.put("password", UserManager.getSHA(password));
+                                                post.put("nickname", nickname);
+                                                post.put("status", 0);
+                                                post.put("timestamp", System.currentTimeMillis() / 1000);
+
+                                                final String checksum = UserManager.makeChecksum();
+                                                post.put("checksum", UserManager.getSHA(checksum));
+
+                                                AVACL acl = new AVACL();
+                                                acl.setPublicReadAccess(true);
+                                                acl.setPublicWriteAccess(true);
+                                                post.setACL(acl);
+
+                                                post.saveInBackground(new SaveCallback() {
+                                                    @Override
+                                                    public void done(AVException e) {
+                                                        if (e == null) {
+                                                            showToast("注册成功");
+
+                                                            UserManager.getInstance().setUsername(username);
+                                                            UserManager.getInstance().login(post.getObjectId(), checksum, nickname);
+
+                                                            finish();
+                                                        } else {
+                                                            filterException(e);
+                                                        }
+                                                    }
+                                                });
                                             }
+                                        } else {
+                                            filterException(e);
                                         }
-                                    });
-                                } catch (Exception e1) {
-                                    e1.printStackTrace();
-                                }
+                                    }
+                                });
                             }
                         } else {
                             filterException(e);

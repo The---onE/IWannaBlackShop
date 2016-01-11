@@ -12,9 +12,12 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.avos.avoscloud.AVObject;
 import com.xmx.iwannablackshop.Chat.Event.InputBottomBarEvent;
 import com.xmx.iwannablackshop.Chat.Event.InputBottomBarTextEvent;
 import com.xmx.iwannablackshop.R;
+import com.xmx.iwannablackshop.User.AutoLoginCallback;
+import com.xmx.iwannablackshop.User.UserManager;
 
 import de.greenrobot.event.EventBus;
 
@@ -59,22 +62,42 @@ public class AVInputBottomBar extends LinearLayout {
         sendTextBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                String content = contentView.getText().toString();
+                final String content = contentView.getText().toString();
                 if (TextUtils.isEmpty(content)) {
                     Toast.makeText(getContext(), R.string.message_is_null, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                contentView.setText("");
-                new Handler().postDelayed(new Runnable() {
+                UserManager.getInstance().checkLogin(new AutoLoginCallback() {
                     @Override
-                    public void run() {
-                        sendTextBtn.setEnabled(true);
-                    }
-                }, MIN_INTERVAL_SEND_MESSAGE);
+                    public void success(AVObject user) {
+                        contentView.setText("");
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                sendTextBtn.setEnabled(true);
+                            }
+                        }, MIN_INTERVAL_SEND_MESSAGE);
 
-                EventBus.getDefault().post(
-                        new InputBottomBarTextEvent(InputBottomBarEvent.INPUTBOTTOMBAR_SEND_TEXT_ACTION, content, getTag()));
+                        EventBus.getDefault().post(
+                                new InputBottomBarTextEvent(InputBottomBarEvent.INPUTBOTTOMBAR_SEND_TEXT_ACTION, content, getTag()));
+                    }
+
+                    @Override
+                    public void notLoggedIn() {
+                        Toast.makeText(getContext(), "请登录", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void errorNetwork() {
+                        Toast.makeText(getContext(), "网络连接失败", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void errorChecksum() {
+                        Toast.makeText(getContext(), "请重新登录", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
     }
