@@ -42,6 +42,9 @@ public class LoginActivity extends BaseTempActivity {
     @Override
     protected void initView(Bundle savedInstanceState) {
         setContentView(R.layout.activity_login);
+
+        EditText un = getViewById(R.id.login_username);
+        un.setText(UserManager.getInstance().getUsername());
     }
 
     @Override
@@ -68,6 +71,7 @@ public class LoginActivity extends BaseTempActivity {
                             @Override
                             public void success(AVObject user) {
                                 showToast("登录成功");
+                                UserManager.getInstance().setUsername(username);
                                 finish();
                             }
 

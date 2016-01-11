@@ -82,6 +82,7 @@ public class RegisterActivity extends BaseTempActivity {
                                             if (e == null) {
                                                 showToast("注册成功");
 
+                                                UserManager.getInstance().setUsername(username);
                                                 UserManager.getInstance().login(post.getObjectId(), checksum, nickname);
 
                                                 finish();

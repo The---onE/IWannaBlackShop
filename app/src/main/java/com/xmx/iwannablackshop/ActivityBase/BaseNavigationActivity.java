@@ -1,10 +1,12 @@
 package com.xmx.iwannablackshop.ActivityBase;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -80,7 +82,23 @@ public abstract class BaseNavigationActivity extends BaseActivity
         if (!loggedinFlag) {
             startActivity(LoginActivity.class);
         } else {
-            logout();
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("退出登录吗？");
+            builder.setTitle("注销");
+            builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    logout();
+                    dialog.dismiss();
+                }
+            });
+            builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.create().show();
         }
     }
 

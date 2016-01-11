@@ -70,6 +70,16 @@ public class UserManager {
         return mSP.getString("id", "");
     }
 
+    public void setUsername(String username) {
+        SharedPreferences.Editor editor = mSP.edit();
+        editor.putString("username", username);
+        editor.apply();
+    }
+
+    public String getUsername() {
+        return mSP.getString("username", "");
+    }
+
     public void login(String id, String cs, String nn) {
         SharedPreferences.Editor editor = mSP.edit();
         editor.putBoolean("loggedin", true);
