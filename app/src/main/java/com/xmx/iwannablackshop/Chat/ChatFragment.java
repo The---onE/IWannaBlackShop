@@ -137,10 +137,10 @@ public class ChatFragment extends Fragment {
   public void onEvent(InputBottomBarTextEvent textEvent) {
     if (null != imConversation && null != textEvent) {
       if (!TextUtils.isEmpty(textEvent.sendContent) && imConversation.getConversationId().equals(textEvent.tag)) {
-        //AVIMTextMessage message = new AVIMTextMessage();
-        //message.setText(textEvent.sendContent);
-        AVIMMessage message = new AVIMMessage();
-        message.setContent(textEvent.sendContent);
+        AVIMTextMessage message = new AVIMTextMessage();
+        message.setText(textEvent.sendContent);
+        //AVIMMessage message = new AVIMMessage();
+        //message.setContent(textEvent.sendContent);
         itemAdapter.addMessage(message);
         itemAdapter.notifyDataSetChanged();
         scrollToBottom();

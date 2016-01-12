@@ -1,7 +1,5 @@
 package com.xmx.iwannablackshop.Chat.Event;
 
-import com.xmx.iwannablackshop.Chat.Event.InputBottomBarEvent;
-
 /**
  * Created by wli on 15/7/29.
  * InputBottomBar 发送文本事件

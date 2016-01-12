@@ -45,7 +45,8 @@
         <activity
             android:name=".User.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".User.RegisterActivity"
+        <activity
+            android:name=".User.RegisterActivity"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
