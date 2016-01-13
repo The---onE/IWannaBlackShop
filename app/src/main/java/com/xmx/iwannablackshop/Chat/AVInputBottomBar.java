@@ -16,7 +16,7 @@ import com.avos.avoscloud.AVObject;
 import com.xmx.iwannablackshop.Chat.Event.InputBottomBarEvent;
 import com.xmx.iwannablackshop.Chat.Event.InputBottomBarTextEvent;
 import com.xmx.iwannablackshop.R;
-import com.xmx.iwannablackshop.User.AutoLoginCallback;
+import com.xmx.iwannablackshop.User.Callback.AutoLoginCallback;
 import com.xmx.iwannablackshop.User.UserManager;
 
 import de.greenrobot.event.EventBus;
@@ -91,6 +91,11 @@ public class AVInputBottomBar extends LinearLayout {
                     @Override
                     public void errorNetwork() {
                         Toast.makeText(getContext(), "网络连接失败", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void errorUsername() {
+                        Toast.makeText(getContext(), "请登录", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override

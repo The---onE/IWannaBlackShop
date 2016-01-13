@@ -12,6 +12,7 @@ import com.avos.avoscloud.CountCallback;
 import com.avos.avoscloud.SaveCallback;
 import com.xmx.iwannablackshop.ActivityBase.BaseTempActivity;
 import com.xmx.iwannablackshop.R;
+import com.xmx.iwannablackshop.User.Callback.RegisterCallback;
 
 public class RegisterActivity extends BaseTempActivity {
 
@@ -51,64 +52,26 @@ public class RegisterActivity extends BaseTempActivity {
                     return;
                 }
 
-                final AVQuery<AVObject> query = AVQuery.getQuery("UserInf");
-                query.whereEqualTo("username", username);
-                query.countInBackground(new CountCallback() {
-                    public void done(final int count, AVException e) {
-                        if (e == null) {
-                            if (count > 0) {
-                                showToast("该用户名已被注册");
-                            } else {
-                                AVQuery<AVObject> query2 = AVQuery.getQuery("UserInf");
-                                query2.whereEqualTo("nickname", nickname);
-                                query2.countInBackground(new CountCallback() {
-                                    @Override
-                                    public void done(int i, AVException e) {
-                                        if (e == null) {
-                                            if (i > 0) {
-                                                showToast("该昵称已被注册");
-                                            } else {
-                                                final AVObject post = new AVObject("UserInf");
+                UserManager.getInstance().register(username, password, nickname, new RegisterCallback() {
+                    @Override
+                    public void success() {
+                        showToast("注册成功");
+                        finish();
+                    }
 
-                                                post.put("username", username);
-                                                post.put("password", UserManager.getSHA(password));
-                                                post.put("nickname", nickname);
-                                                post.put("status", 0);
-                                                post.put("timestamp", System.currentTimeMillis() / 1000);
+                    @Override
+                    public void usernameExist() {
+                        showToast("该用户名已被注册");
+                    }
 
-                                                final String checksum = UserManager.makeChecksum();
-                                                post.put("checksum", UserManager.getSHA(checksum));
+                    @Override
+                    public void nicknameExist() {
+                        showToast("该昵称已被注册");
+                    }
 
-                                                AVACL acl = new AVACL();
-                                                acl.setPublicReadAccess(true);
-                                                acl.setPublicWriteAccess(true);
-                                                post.setACL(acl);
-
-                                                post.saveInBackground(new SaveCallback() {
-                                                    @Override
-                                                    public void done(AVException e) {
-                                                        if (e == null) {
-                                                            showToast("注册成功");
-
-                                                            UserManager.getInstance().setUsername(username);
-                                                            UserManager.getInstance().login(post.getObjectId(), checksum, nickname);
-
-                                                            finish();
-                                                        } else {
-                                                            filterException(e);
-                                                        }
-                                                    }
-                                                });
-                                            }
-                                        } else {
-                                            filterException(e);
-                                        }
-                                    }
-                                });
-                            }
-                        } else {
-                            filterException(e);
-                        }
+                    @Override
+                    public void errorNetwork() {
+                        showToast("网络连接失败");
                     }
                 });
             }

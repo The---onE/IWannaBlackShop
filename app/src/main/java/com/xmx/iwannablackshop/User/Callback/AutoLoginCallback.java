@@ -1,4 +1,4 @@
-package com.xmx.iwannablackshop.User;
+package com.xmx.iwannablackshop.User.Callback;
 
 import com.avos.avoscloud.AVObject;
 
@@ -14,6 +14,8 @@ public abstract class AutoLoginCallback {
     public abstract void notLoggedIn();
 
     public abstract void errorNetwork();
+
+    public abstract void errorUsername();
 
     public abstract void errorChecksum();
 }

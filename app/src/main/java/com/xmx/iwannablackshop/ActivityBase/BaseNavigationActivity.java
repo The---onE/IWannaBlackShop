@@ -13,7 +13,7 @@ import android.view.MenuItem;
 
 import com.avos.avoscloud.AVObject;
 import com.xmx.iwannablackshop.R;
-import com.xmx.iwannablackshop.User.AutoLoginCallback;
+import com.xmx.iwannablackshop.User.Callback.AutoLoginCallback;
 import com.xmx.iwannablackshop.User.LoginActivity;
 import com.xmx.iwannablackshop.User.UserManager;
 
@@ -134,6 +134,12 @@ public abstract class BaseNavigationActivity extends BaseActivity
             @Override
             public void errorNetwork() {
                 showToast("网络连接失败");
+                login.setTitle("登录");
+                loggedinFlag = false;
+            }
+
+            @Override
+            public void errorUsername() {
                 login.setTitle("登录");
                 loggedinFlag = false;
             }

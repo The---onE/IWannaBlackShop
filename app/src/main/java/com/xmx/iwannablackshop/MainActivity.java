@@ -19,7 +19,7 @@ import com.xmx.iwannablackshop.Item.SelectRoomActivity;
 import com.xmx.iwannablackshop.ActivityBase.BaseNavigationActivity;
 import com.xmx.iwannablackshop.Item.ItemAdapter;
 import com.xmx.iwannablackshop.Item.Item;
-import com.xmx.iwannablackshop.User.AutoLoginCallback;
+import com.xmx.iwannablackshop.User.Callback.AutoLoginCallback;
 import com.xmx.iwannablackshop.User.UserManager;
 
 import java.util.ArrayList;
@@ -106,6 +106,11 @@ public class MainActivity extends BaseNavigationActivity
 
             @Override
             public void errorNetwork() {
+            }
+
+            @Override
+            public void errorUsername() {
+
             }
 
             @Override

@@ -1,4 +1,4 @@
-package com.xmx.iwannablackshop.User;
+package com.xmx.iwannablackshop.User.Callback;
 
 import com.avos.avoscloud.AVObject;
 

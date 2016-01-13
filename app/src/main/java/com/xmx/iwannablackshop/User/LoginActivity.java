@@ -7,6 +7,8 @@ import android.widget.EditText;
 import com.avos.avoscloud.AVObject;
 import com.xmx.iwannablackshop.ActivityBase.BaseTempActivity;
 import com.xmx.iwannablackshop.R;
+import com.xmx.iwannablackshop.User.Callback.AutoLoginCallback;
+import com.xmx.iwannablackshop.User.Callback.LoginCallback;
 
 public class LoginActivity extends BaseTempActivity {
 
@@ -30,6 +32,11 @@ public class LoginActivity extends BaseTempActivity {
                     @Override
                     public void errorNetwork() {
                         showToast("网络连接失败");
+                    }
+
+                    @Override
+                    public void errorUsername() {
+
                     }
 
                     @Override
@@ -71,7 +78,6 @@ public class LoginActivity extends BaseTempActivity {
                             @Override
                             public void success(AVObject user) {
                                 showToast("登录成功");
-                                UserManager.getInstance().setUsername(username);
                                 finish();
                             }
 

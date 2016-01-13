@@ -72,6 +72,8 @@ public class AVImClientManager {
                     }
                 }
             });
+        } else {
+            callback.success(conversation);
         }
     }
 

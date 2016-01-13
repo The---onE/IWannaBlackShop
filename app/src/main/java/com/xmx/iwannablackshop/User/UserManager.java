@@ -3,9 +3,11 @@ package com.xmx.iwannablackshop.User;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.avos.avoscloud.AVACL;
 import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.CountCallback;
 import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.GetCallback;
 import com.avos.avoscloud.SaveCallback;
@@ -13,6 +15,9 @@ import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
 import com.xmx.iwannablackshop.Chat.AVImClientManager;
+import com.xmx.iwannablackshop.User.Callback.AutoLoginCallback;
+import com.xmx.iwannablackshop.User.Callback.LoginCallback;
+import com.xmx.iwannablackshop.User.Callback.RegisterCallback;
 
 import java.security.MessageDigest;
 import java.util.List;
@@ -60,30 +65,14 @@ public class UserManager {
         return mSP.getString("checksum", "");
     }
 
-    public void setId(String id) {
-        SharedPreferences.Editor editor = mSP.edit();
-        editor.putString("id", id);
-        editor.apply();
-    }
-
-    public String getId() {
-        return mSP.getString("id", "");
-    }
-
-    public void setUsername(String username) {
-        SharedPreferences.Editor editor = mSP.edit();
-        editor.putString("username", username);
-        editor.apply();
-    }
-
     public String getUsername() {
         return mSP.getString("username", "");
     }
 
-    public void login(String id, String cs, String nn) {
+    public void login(String un, String cs, String nn) {
         SharedPreferences.Editor editor = mSP.edit();
         editor.putBoolean("loggedin", true);
-        editor.putString("id", id);
+        editor.putString("username", un);
         editor.putString("checksum", cs);
         editor.putString("nickname", nn);
         editor.apply();
@@ -94,7 +83,7 @@ public class UserManager {
     public void logout() {
         SharedPreferences.Editor editor = mSP.edit();
         editor.putBoolean("loggedin", false);
-        editor.putString("id", "");
+        editor.putString("username", "");
         editor.putString("checksum", "");
         editor.putString("nickname", "");
         editor.apply();
@@ -126,6 +115,68 @@ public class UserManager {
         AVImClientManager.getInstance().close();
     }
 
+    public void register(final String username, final String password, final String nickname, final RegisterCallback registerCallback) {
+        final AVQuery<AVObject> query = AVQuery.getQuery("UserInf");
+        query.whereEqualTo("username", username);
+        query.countInBackground(new CountCallback() {
+            public void done(final int count, AVException e) {
+                if (e == null) {
+                    if (count > 0) {
+                        registerCallback.usernameExist();
+                    } else {
+                        AVQuery<AVObject> query2 = AVQuery.getQuery("UserData");
+                        query2.whereEqualTo("nickname", nickname);
+                        query2.countInBackground(new CountCallback() {
+                            @Override
+                            public void done(int i, AVException e) {
+                                if (e == null) {
+                                    if (i > 0) {
+                                        registerCallback.nicknameExist();
+                                    } else {
+                                        final AVObject post = new AVObject("UserInf");
+                                        post.put("username", username);
+                                        post.put("password", UserManager.getSHA(password));
+                                        post.put("status", 0);
+                                        post.put("timestamp", System.currentTimeMillis() / 1000);
+
+                                        final AVObject data = new AVObject("UserData");
+                                        data.put("username", username);
+                                        data.put("nickname", nickname);
+                                        final String checksum = UserManager.makeChecksum();
+                                        data.put("checksumA", UserManager.getSHA(checksum));
+
+                                        post.put("data", data);
+
+                                        AVACL acl = new AVACL();
+                                        acl.setPublicReadAccess(true);
+                                        acl.setPublicWriteAccess(false);
+                                        post.setACL(acl);
+
+                                        post.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(AVException e) {
+                                                if (e == null) {
+                                                    login(username, checksum, nickname);
+                                                    registerCallback.success();
+                                                } else {
+                                                    registerCallback.errorNetwork();
+                                                }
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    registerCallback.errorNetwork();
+                                }
+                            }
+                        });
+                    }
+                } else {
+                    registerCallback.errorNetwork();
+                }
+            }
+        });
+    }
+
     public void login(final String username, final String password, final LoginCallback loginCallback) {
         AVQuery<AVObject> query = new AVQuery<>("UserInf");
         query.whereEqualTo("username", username);
@@ -137,15 +188,24 @@ public class UserManager {
                         final AVObject user = avObjects.get(0);
                         String rightPassword = user.getString("password");
                         if (rightPassword.equals(getSHA(password))) {
-                            final String newChecksum = makeChecksum();
-                            final String nickname = user.getString("nickname");
-                            user.put("checksum", getSHA(newChecksum));
-                            user.saveInBackground(new SaveCallback() {
+                            user.getAVObject("data").fetchIfNeededInBackground(new GetCallback<AVObject>() {
                                 @Override
-                                public void done(AVException e) {
+                                public void done(AVObject data, AVException e) {
                                     if (e == null) {
-                                        login(user.getObjectId(), newChecksum, nickname);
-                                        loginCallback.success(user);
+                                        final String nickname = data.getString("nickname");
+                                        final String newChecksum = makeChecksum();
+                                        data.put("checksumA", getSHA(newChecksum));
+                                        data.saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(AVException e) {
+                                                if (e == null) {
+                                                    login(username, newChecksum, nickname);
+                                                    loginCallback.success(user);
+                                                } else {
+                                                    loginCallback.errorNetwork();
+                                                }
+                                            }
+                                        });
                                     } else {
                                         loginCallback.errorNetwork();
                                     }
@@ -165,35 +225,41 @@ public class UserManager {
     }
 
     public void autoLogin(final AutoLoginCallback loginCallback) {
-        final String id = getId();
-        if (!isLoggedIn() || id.equals("")) {
+        final String username = getUsername();
+        if (!isLoggedIn() || username.equals("")) {
             loginCallback.notLoggedIn();
             return;
         }
-        AVQuery<AVObject> query = new AVQuery<>("UserInf");
-        query.getInBackground(id, new GetCallback<AVObject>() {
+        AVQuery<AVObject> query = new AVQuery<>("UserData");
+        query.whereEqualTo("username", username);
+        query.findInBackground(new FindCallback<AVObject>() {
             @Override
-            public void done(final AVObject user, AVException e) {
+            public void done(List<AVObject> list, AVException e) {
                 if (e == null) {
-                    String checksum = user.getString("checksum");
-                    if (checksum.equals(getSHA(getChecksum()))) {
-                        final String newChecksum = makeChecksum();
-                        final String nickname = user.getString("nickname");
-                        user.put("checksum", getSHA(newChecksum));
-                        user.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(AVException e) {
-                                if (e == null) {
-                                    login(id, newChecksum, nickname);
-                                    loginCallback.success(user);
-                                } else {
-                                    loginCallback.errorNetwork();
+                    if (list.size() > 0) {
+                        final AVObject user = list.get(0);
+                        String checksum = user.getString("checksumA");
+                        if (checksum.equals(getSHA(getChecksum()))) {
+                            final String nickname = user.getString("nickname");
+                            final String newChecksum = makeChecksum();
+                            user.put("checksumA", getSHA(newChecksum));
+                            user.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(AVException e) {
+                                    if (e == null) {
+                                        login(username, newChecksum, nickname);
+                                        loginCallback.success(user);
+                                    } else {
+                                        loginCallback.errorNetwork();
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        } else {
+                            logout();
+                            loginCallback.errorChecksum();
+                        }
                     } else {
-                        logout();
-                        loginCallback.errorChecksum();
+                        loginCallback.errorUsername();
                     }
                 } else {
                     loginCallback.errorNetwork();
@@ -203,22 +269,28 @@ public class UserManager {
     }
 
     public void checkLogin(final AutoLoginCallback loginCallback) {
-        String id = getId();
-        if (!isLoggedIn() || id.equals("")) {
+        String username = getUsername();
+        if (!isLoggedIn() || username.equals("")) {
             loginCallback.notLoggedIn();
             return;
         }
-        AVQuery<AVObject> query = new AVQuery<>("UserInf");
-        query.getInBackground(id, new GetCallback<AVObject>() {
+        AVQuery<AVObject> query = new AVQuery<>("UserData");
+        query.whereEqualTo("username", username);
+        query.findInBackground(new FindCallback<AVObject>() {
             @Override
-            public void done(final AVObject user, AVException e) {
+            public void done(List<AVObject> list, AVException e) {
                 if (e == null) {
-                    String checksum = user.getString("checksum");
-                    if (checksum.equals(getSHA(getChecksum()))) {
-                        loginCallback.success(user);
+                    if (list.size() > 0) {
+                        AVObject user = list.get(0);
+                        String checksum = user.getString("checksumA");
+                        if (checksum.equals(getSHA(getChecksum()))) {
+                            loginCallback.success(user);
+                        } else {
+                            logout();
+                            loginCallback.errorChecksum();
+                        }
                     } else {
-                        logout();
-                        loginCallback.errorChecksum();
+                        loginCallback.errorUsername();
                     }
                 } else {
                     loginCallback.errorNetwork();
