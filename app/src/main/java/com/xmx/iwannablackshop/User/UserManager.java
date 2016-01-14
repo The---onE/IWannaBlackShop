@@ -77,6 +77,8 @@ public class UserManager {
         editor.putString("nickname", nn);
         editor.apply();
 
+        saveLog(un);
+
         openClient(nn);
     }
 
@@ -89,6 +91,22 @@ public class UserManager {
         editor.apply();
 
         closeClient();
+    }
+
+    public void saveLog(String username) {
+        final AVObject post = new AVObject("LoginLog");
+        post.put("username", username);
+        post.put("status", 0);
+        post.put("timestamp", System.currentTimeMillis() / 1000);
+
+        post.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(AVException e) {
+                if (e != null) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     public boolean isLoggedIn() {
