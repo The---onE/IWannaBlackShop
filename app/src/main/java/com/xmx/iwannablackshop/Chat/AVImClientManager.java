@@ -121,6 +121,23 @@ public class AVImClientManager {
                 });
     }
 
+    public void createSideText(String user, final CreateConversationCallback callback) {
+        ArrayList<String> members = new ArrayList<>();
+        members.add(clientId);
+        members.add(user);
+        avimClient.createConversation(members, "side-text", null, false, true,
+                new AVIMConversationCreatedCallback() {
+                    @Override
+                    public void done(AVIMConversation avimConversation, AVIMException e) {
+                        if (e == null) {
+                            callback.success(avimConversation);
+                        } else {
+                            callback.failure(e);
+                        }
+                    }
+                });
+    }
+
     public AVIMClient getClient() {
         return avimClient;
     }

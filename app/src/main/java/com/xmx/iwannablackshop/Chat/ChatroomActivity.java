@@ -119,8 +119,7 @@ public class ChatroomActivity extends BaseTempActivity {
      * 处理聊天 item 点击事件，点击后跳转到相应1对1的对话
      */
     public void onEvent(LeftChatItemClickEvent event) {
-//        Intent intent = new Intent(this, AVSingleChatActivity.class);
-//        intent.putExtra(Constants.MEMBER_ID, event.userId);
-//        startActivity(intent);
+        startActivity(SideTextActivity.class,
+                "user", event.userId);
     }
 }

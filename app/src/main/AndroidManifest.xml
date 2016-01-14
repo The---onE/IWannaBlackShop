@@ -43,6 +43,9 @@
             android:name=".Chat.ChatroomActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".Chat.SideTextActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".User.LoginActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
