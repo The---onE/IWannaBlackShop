@@ -125,7 +125,7 @@ public class AVImClientManager {
         ArrayList<String> members = new ArrayList<>();
         members.add(clientId);
         members.add(user);
-        avimClient.createConversation(members, "side-text", null, false, true,
+        avimClient.createConversation(members, "#st#*"+clientId+"#*"+user, null, false, true,
                 new AVIMConversationCreatedCallback() {
                     @Override
                     public void done(AVIMConversation avimConversation, AVIMException e) {

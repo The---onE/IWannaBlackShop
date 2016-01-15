@@ -65,27 +65,36 @@ public class MessageHandler extends AVIMTypedMessageHandler<AVIMTypedMessage> {
     }
 
     private void sendNotification(final AVIMTypedMessage message, AVIMConversation conversation) {
-        final String notificationContent = message instanceof AVIMTextMessage ?
+        final String content = message instanceof AVIMTextMessage ?
                 ((AVIMTextMessage) message).getText() : context.getString(R.string.unsupported_message_type);
 
-        final String id = conversation.getName();
+        final String convName = conversation.getName();
+        if (convName.contains("#st#")) {
+            String from = message.getFrom();
 
-        AVQuery<AVObject> query = new AVQuery<>("Item");
-        query.getInBackground(id, new GetCallback<AVObject>() {
-            public void done(AVObject post, AVException e) {
-                if (e == null) {
-                    String from = message.getFrom();
-                    String content = notificationContent;
+            Intent intent = new Intent(context, NotificationBroadcastReceiver.class);
+            intent.putExtra("type", "side-text");
+            intent.putExtra("user", message.getFrom());
+            NotificationUtils.showNotification(context, "私聊",
+                    from + " : " + content, null, intent);
+        } else {
+            AVQuery<AVObject> query = new AVQuery<>("Item");
+            query.getInBackground(convName, new GetCallback<AVObject>() {
+                public void done(AVObject post, AVException e) {
+                    if (e == null) {
+                        String from = message.getFrom();
 
-                    Intent intent = new Intent(context, NotificationBroadcastReceiver.class);
-                    intent.putExtra("id", id);
-                    intent.putExtra("title", post.getString("title"));
-                    NotificationUtils.showNotification(context, post.getString("title"),
-                            from + " : " + content, null, intent);
-                } else {
-                    e.printStackTrace();
+                        Intent intent = new Intent(context, NotificationBroadcastReceiver.class);
+                        intent.putExtra("type", "chatroom");
+                        intent.putExtra("id", convName);
+                        intent.putExtra("title", post.getString("title"));
+                        NotificationUtils.showNotification(context, post.getString("title"),
+                                from + " : " + content, null, intent);
+                    } else {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 }

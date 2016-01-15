@@ -20,9 +20,19 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
         if (AVImClientManager.getInstance().getClient() == null) {
             gotoMainActivity(context);
         } else {
-            String itemId = intent.getStringExtra("id");
-            if (!TextUtils.isEmpty(itemId)) {
-                gotoChatroomActivity(context, intent);
+            String type = intent.getStringExtra("type");
+            if (type != null) {
+                if (type.equals("side-text")) {
+                    String user = intent.getStringExtra("user");
+                    if (!TextUtils.isEmpty(user)) {
+                        gotoSideTextActivity(context, intent);
+                    }
+                } else if (type.equals("chatroom")) {
+                    String id = intent.getStringExtra("id");
+                    if (!TextUtils.isEmpty(id)) {
+                        gotoChatroomActivity(context, intent);
+                    }
+                }
             }
         }
     }
@@ -36,6 +46,13 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
         Intent startActivityIntent = new Intent(context, MainActivity.class);
         startActivityIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(startActivityIntent);
+    }
+
+    private void gotoSideTextActivity(final Context context, final Intent intent) {
+        Intent start = new Intent(context, ChatroomActivity.class);
+        start.putExtra("user", intent.getStringExtra("user"));
+        start.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(start);
     }
 
     /**
