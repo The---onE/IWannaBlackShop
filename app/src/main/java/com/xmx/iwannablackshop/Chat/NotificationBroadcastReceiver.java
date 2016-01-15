@@ -49,7 +49,7 @@ public class NotificationBroadcastReceiver extends BroadcastReceiver {
     }
 
     private void gotoSideTextActivity(final Context context, final Intent intent) {
-        Intent start = new Intent(context, ChatroomActivity.class);
+        Intent start = new Intent(context, SideTextActivity.class);
         start.putExtra("user", intent.getStringExtra("user"));
         start.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(start);
