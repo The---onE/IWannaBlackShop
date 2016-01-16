@@ -94,7 +94,9 @@ public class ChatFragment extends Fragment {
   @Override
   public void onPause() {
     super.onResume();
-    NotificationUtils.removeTag(imConversation.getConversationId());
+    if (null != imConversation) {
+      NotificationUtils.removeTag(imConversation.getConversationId());
+    }
   }
 
   @Override

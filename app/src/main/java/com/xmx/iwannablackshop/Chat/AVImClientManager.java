@@ -78,14 +78,16 @@ public class AVImClientManager {
     }
 
     public void quitConversation(AVIMConversation conversation) {
-        conversation.quit(new AVIMConversationCallback() {
-            @Override
-            public void done(AVIMException e) {
-                if (e != null) {
-                    e.printStackTrace();
+        if (conversation != null) {
+            conversation.quit(new AVIMConversationCallback() {
+                @Override
+                public void done(AVIMException e) {
+                    if (e != null) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public void findConversation(String name, final FindConversationCallback callback) {
