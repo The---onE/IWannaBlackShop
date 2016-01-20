@@ -3,6 +3,7 @@ package com.xmx.iwannablackshop.PushMessage;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.xmx.iwannablackshop.ActivityBase.BaseTempActivity;
 import com.xmx.iwannablackshop.R;
@@ -27,9 +28,28 @@ public class ReceiveMessageActivity extends BaseTempActivity {
             String data = getIntent().getStringExtra("com.avos.avoscloud.Data");
             JSONObject json = new JSONObject(data);
 
-            String alert = json.getString("alert");
-            if (alert != null) {
-                setTitle(alert);
+            try {
+                String alert = json.getString("alert");
+                if (alert != null) {
+                    setTitle(alert);
+                } else {
+                    setTitle(R.string.app_name);
+                }
+            } catch (JSONException e) {
+                setTitle(R.string.app_name);
+            }
+
+            try {
+                String content = json.getString("content");
+                TextView contentView = getViewById(R.id.message_content);
+                if (content != null) {
+                    contentView.setText(content);
+                } else {
+                    contentView.setText("");
+                }
+            } catch (JSONException e) {
+                TextView contentView = getViewById(R.id.message_content);
+                contentView.setText("");
             }
 
             try {
@@ -37,6 +57,8 @@ public class ReceiveMessageActivity extends BaseTempActivity {
                 String url = json.getString("file_url");
                 if (url != null) {
                     urlView.setText(url);
+                } else {
+                    urlView.setVisibility(View.INVISIBLE);
                 }
             } catch (JSONException e) {
                 EditText urlView = getViewById(R.id.file_url);

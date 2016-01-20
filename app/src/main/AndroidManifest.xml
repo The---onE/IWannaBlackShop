@@ -55,7 +55,11 @@
         <activity
             android:name=".User.RegisterActivity"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".PushMessage.ReceiveMessageActivity"
+        <activity
+            android:name=".PushMessage.ReceiveMessageActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".PushMessage.PushMessageActivity"
             android:theme="@style/AppTheme.NoActionBar" />
     </application>
 

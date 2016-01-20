@@ -18,6 +18,11 @@
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
             android:title="Tools" />
+        <item
+            android:id="@+id/nav_push"
+            android:enabled="false"
+            android:icon="@drawable/ic_menu_manage"
+            android:title="请登录" />
     </group>
 
     <item android:title="Communicate">

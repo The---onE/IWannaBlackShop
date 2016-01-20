@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.avos.avoscloud.AVObject;
+import com.xmx.iwannablackshop.PushMessage.PushMessageActivity;
 import com.xmx.iwannablackshop.R;
 import com.xmx.iwannablackshop.User.Callback.AutoLoginCallback;
 import com.xmx.iwannablackshop.User.LoginActivity;
@@ -67,6 +68,8 @@ public abstract class BaseNavigationActivity extends BaseActivity
             showToast("Press Nav_slideshow");
         } else if (id == R.id.nav_manage) {
             login();
+        } else if (id == R.id.nav_push) {
+            push();
         } else if (id == R.id.nav_share) {
             showToast("Press Nav_share");
         } else if (id == R.id.nav_send) {
@@ -102,12 +105,19 @@ public abstract class BaseNavigationActivity extends BaseActivity
         }
     }
 
+    private void push() {
+        startActivity(PushMessageActivity.class);
+    }
+
     private void logout() {
         UserManager.getInstance().logout();
         NavigationView navigation = getViewById(R.id.nav_view);
         Menu menu = navigation.getMenu();
         MenuItem login = menu.findItem(R.id.nav_manage);
         login.setTitle("登录");
+        MenuItem push = menu.findItem(R.id.nav_push);
+        push.setTitle("请登录");
+        push.setEnabled(false);
         loggedinFlag = false;
     }
 
@@ -122,6 +132,18 @@ public abstract class BaseNavigationActivity extends BaseActivity
             @Override
             public void success(AVObject user) {
                 login.setTitle(user.getString("nickname"));
+
+                NavigationView navigation = (NavigationView) findViewById(R.id.nav_view);
+                Menu menu = navigation.getMenu();
+                MenuItem push = menu.findItem(R.id.nav_push);
+                if (user.getInt("status") == 1) {
+                    push.setTitle("推送");
+                    push.setEnabled(true);
+                } else {
+                    push.setTitle("推送");
+                    push.setEnabled(false);
+                }
+
                 loggedinFlag = true;
             }
 
