@@ -2,6 +2,7 @@ package com.xmx.iwannablackshop.Chat;
 
 import android.os.Bundle;
 
+import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMConversation;
 import com.avos.avoscloud.im.v2.AVIMException;
@@ -12,6 +13,7 @@ import com.xmx.iwannablackshop.Chat.Callback.FindConversationCallback;
 import com.xmx.iwannablackshop.Chat.Callback.JoinConversationCallback;
 import com.xmx.iwannablackshop.Chat.Event.LeftChatItemClickEvent;
 import com.xmx.iwannablackshop.R;
+import com.xmx.iwannablackshop.User.Callback.AutoLoginCallback;
 import com.xmx.iwannablackshop.User.UserManager;
 
 public class ChatroomActivity extends BaseTempActivity {
@@ -118,8 +120,33 @@ public class ChatroomActivity extends BaseTempActivity {
     /**
      * 处理聊天 item 点击事件，点击后跳转到相应1对1的对话
      */
-    public void onEvent(LeftChatItemClickEvent event) {
-        startActivity(SideTextActivity.class,
-                "user", event.userId);
+    public void onEvent(final LeftChatItemClickEvent event) {
+        UserManager.getInstance().checkLogin(new AutoLoginCallback() {
+            @Override
+            public void success(AVObject user) {
+                startActivity(SideTextActivity.class,
+                        "user", event.userId);
+            }
+
+            @Override
+            public void notLoggedIn() {
+                showToast("请登录");
+            }
+
+            @Override
+            public void errorNetwork() {
+                showToast("网络连接失败");
+            }
+
+            @Override
+            public void errorUsername() {
+                showToast("请登录");
+            }
+
+            @Override
+            public void errorChecksum() {
+                showToast("请重新登录");
+            }
+        });
     }
 }
