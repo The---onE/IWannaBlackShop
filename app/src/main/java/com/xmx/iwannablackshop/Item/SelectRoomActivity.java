@@ -5,13 +5,24 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 
+import com.avos.avoscloud.AVInstallation;
+import com.avos.avoscloud.PushService;
 import com.xmx.iwannablackshop.ActivityBase.BaseNavigationActivity;
 import com.xmx.iwannablackshop.Chat.ChatroomActivity;
+import com.xmx.iwannablackshop.PushMessage.ReceiveMessageActivity;
 import com.xmx.iwannablackshop.R;
 
 public class SelectRoomActivity extends BaseNavigationActivity {
     String id;
     String title;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        title = getIntent().getStringExtra("title");
+        PushService.unsubscribe(this, title);
+        AVInstallation.getCurrentInstallation().saveInBackground();
+    }
 
     @Override
     protected void initView(Bundle savedInstanceState) {
@@ -23,18 +34,9 @@ public class SelectRoomActivity extends BaseNavigationActivity {
         id = getIntent().getStringExtra("id");
         title = getIntent().getStringExtra("title");
 
-        /*AVQuery<AVObject> query = new AVQuery<>("Item");
-        query.getInBackground(id, new GetCallback<AVObject>() {
-            public void done(AVObject post, AVException e) {
-                if (e == null) {
-                    getSupportActionBar().setTitle(post.getString("title"));
-                } else {
-                    filterException(e);
-                }
-            }
-        });*/
-
         setTitle(title);
+        PushService.subscribe(this, title, ReceiveMessageActivity.class);
+        AVInstallation.getCurrentInstallation().saveInBackground();
     }
 
     @Override
