@@ -41,6 +41,30 @@
             android:paddingTop="@dimen/activity_vertical_margin"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
+            <LinearLayout
+                style="?android:buttonBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    style="?android:actionButtonStyle"
+                    android:id="@+id/subscribe"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/subscribe"/>
+
+                <Button
+                    style="?android:actionButtonStyle"
+                    android:id="@+id/unsubscribe"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/unsubscribe"/>
+
+
+            </LinearLayout>
+
             <Button
                 android:id="@+id/chatroom_button"
                 android:layout_width="match_parent"

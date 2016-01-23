@@ -18,6 +18,9 @@
     <string name="confirm_exit">再按一次退出程序</string>
     <string name="default_string">加载中&#8230;</string>
 
+    <string name="subscribe">关注</string>
+    <string name="unsubscribe">取关</string>
+
     <string name="message_is_null">请输入要发送的内容</string>
     <string name="unsupported_message_type">暂不支持此消息类型</string>
 

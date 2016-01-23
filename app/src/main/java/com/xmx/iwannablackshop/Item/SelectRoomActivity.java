@@ -11,18 +11,11 @@ import com.xmx.iwannablackshop.ActivityBase.BaseNavigationActivity;
 import com.xmx.iwannablackshop.Chat.ChatroomActivity;
 import com.xmx.iwannablackshop.PushMessage.ReceiveMessageActivity;
 import com.xmx.iwannablackshop.R;
+import com.xmx.iwannablackshop.User.UserManager;
 
 public class SelectRoomActivity extends BaseNavigationActivity {
     String id;
     String title;
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        title = getIntent().getStringExtra("title");
-        PushService.unsubscribe(this, title);
-        AVInstallation.getCurrentInstallation().saveInBackground();
-    }
 
     @Override
     protected void initView(Bundle savedInstanceState) {
@@ -35,8 +28,6 @@ public class SelectRoomActivity extends BaseNavigationActivity {
         title = getIntent().getStringExtra("title");
 
         setTitle(title);
-        PushService.subscribe(this, title, ReceiveMessageActivity.class);
-        AVInstallation.getCurrentInstallation().saveInBackground();
     }
 
     @Override
@@ -48,6 +39,22 @@ public class SelectRoomActivity extends BaseNavigationActivity {
                 startActivity(ChatroomActivity.class,
                         "id", id,
                         "title", title);
+            }
+        });
+
+        getViewById(R.id.subscribe).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PushService.subscribe(getBaseContext(), UserManager.getSHA(title), ReceiveMessageActivity.class);
+                AVInstallation.getCurrentInstallation().saveInBackground();
+            }
+        });
+
+        getViewById(R.id.unsubscribe).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PushService.unsubscribe(getBaseContext(), UserManager.getSHA(title));
+                AVInstallation.getCurrentInstallation().saveInBackground();
             }
         });
     }
