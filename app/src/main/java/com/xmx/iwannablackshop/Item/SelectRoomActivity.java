@@ -9,6 +9,7 @@ import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.PushService;
 import com.xmx.iwannablackshop.ActivityBase.BaseNavigationActivity;
 import com.xmx.iwannablackshop.Chat.ChatroomActivity;
+import com.xmx.iwannablackshop.PushMessage.PushItemMessageActivity;
 import com.xmx.iwannablackshop.PushMessage.ReceiveMessageActivity;
 import com.xmx.iwannablackshop.R;
 import com.xmx.iwannablackshop.User.UserManager;
@@ -42,7 +43,17 @@ public class SelectRoomActivity extends BaseNavigationActivity {
             }
         });
 
-        getViewById(R.id.subscribe).setOnClickListener(new View.OnClickListener() {
+        Button push = getViewById(R.id.push_message);
+        push.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(PushItemMessageActivity.class,
+                        "title", title);
+            }
+        });
+
+        Button subscribe = getViewById(R.id.subscribe);
+        subscribe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 PushService.subscribe(getBaseContext(), UserManager.getSHA(title), ReceiveMessageActivity.class);
@@ -50,7 +61,8 @@ public class SelectRoomActivity extends BaseNavigationActivity {
             }
         });
 
-        getViewById(R.id.unsubscribe).setOnClickListener(new View.OnClickListener() {
+        Button unsubscribe = getViewById(R.id.unsubscribe);
+        unsubscribe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 PushService.unsubscribe(getBaseContext(), UserManager.getSHA(title));

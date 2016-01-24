@@ -72,6 +72,13 @@
                 android:text="公共讨论区"
                 android:textSize="28sp" />
 
+            <Button
+                android:id="@+id/push_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=" 推送消息"
+                android:textSize="28sp" />
+
         </LinearLayout>
 
 
