@@ -5,14 +5,21 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 
+import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVInstallation;
+import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.PushService;
+import com.avos.avoscloud.SaveCallback;
 import com.xmx.iwannablackshop.ActivityBase.BaseNavigationActivity;
 import com.xmx.iwannablackshop.Chat.ChatroomActivity;
 import com.xmx.iwannablackshop.PushMessage.PushItemMessageActivity;
 import com.xmx.iwannablackshop.PushMessage.ReceiveMessageActivity;
 import com.xmx.iwannablackshop.R;
+import com.xmx.iwannablackshop.User.Callback.AutoLoginCallback;
 import com.xmx.iwannablackshop.User.UserManager;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SelectRoomActivity extends BaseNavigationActivity {
     String id;
@@ -56,8 +63,64 @@ public class SelectRoomActivity extends BaseNavigationActivity {
         subscribe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PushService.subscribe(getBaseContext(), UserManager.getSHA(title), ReceiveMessageActivity.class);
-                AVInstallation.getCurrentInstallation().saveInBackground();
+                UserManager.getInstance().checkLogin(new AutoLoginCallback() {
+                    @Override
+                    public void success(AVObject user) {
+                        List<String> subscribing = user.getList("subscribing");
+                        if (subscribing == null) {
+                            subscribing = new ArrayList<>();
+                        }
+
+                        if (subscribing.contains(title)) {
+                            showToast("已经关注过了");
+                            PushService.subscribe(getBaseContext(), UserManager.getSHA(title), ReceiveMessageActivity.class);
+                            AVInstallation.getCurrentInstallation().saveInBackground();
+                        } else {
+                            subscribing.add(title);
+                            user.put("subscribing", subscribing);
+                            user.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(AVException e) {
+                                    if (e == null) {
+                                        PushService.subscribe(getBaseContext(), UserManager.getSHA(title), ReceiveMessageActivity.class);
+                                        AVInstallation.getCurrentInstallation().saveInBackground(new SaveCallback() {
+                                            @Override
+                                            public void done(AVException e) {
+                                                if (e == null) {
+                                                    showToast("关注成功");
+                                                } else {
+                                                    filterException(e);
+                                                }
+                                            }
+                                        });
+                                    } else {
+                                        filterException(e);
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void notLoggedIn() {
+                        showToast("请登录");
+                    }
+
+                    @Override
+                    public void errorNetwork() {
+                        showToast("网络连接失败");
+                    }
+
+                    @Override
+                    public void errorUsername() {
+                        showToast("请登录");
+                    }
+
+                    @Override
+                    public void errorChecksum() {
+                        showToast("请重新登录");
+                    }
+                });
             }
         });
 
@@ -67,6 +130,52 @@ public class SelectRoomActivity extends BaseNavigationActivity {
             public void onClick(View v) {
                 PushService.unsubscribe(getBaseContext(), UserManager.getSHA(title));
                 AVInstallation.getCurrentInstallation().saveInBackground();
+                UserManager.getInstance().checkLogin(new AutoLoginCallback() {
+                    @Override
+                    public void success(AVObject user) {
+                        List<String> subscribing = user.getList("subscribing");
+                        if (subscribing == null) {
+                            showToast("没有关注过");
+                        } else {
+                            if (!subscribing.contains(title)) {
+                                showToast("没有关注过");
+                            } else {
+                                subscribing.remove(title);
+                                user.put("subscribing", subscribing);
+                                user.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(AVException e) {
+                                        if (e == null) {
+                                            showToast("取关成功");
+                                        } else {
+                                            filterException(e);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void notLoggedIn() {
+                        showToast("请登录");
+                    }
+
+                    @Override
+                    public void errorNetwork() {
+                        showToast("网络连接失败");
+                    }
+
+                    @Override
+                    public void errorUsername() {
+                        showToast("请登录");
+                    }
+
+                    @Override
+                    public void errorChecksum() {
+                        showToast("请重新登录");
+                    }
+                });
             }
         });
     }

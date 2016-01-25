@@ -18,7 +18,7 @@ public class Application extends android.app.Application {
         AVOSCloud.initialize(this, "jg8rpu25f2dTGU4dSWLo96tg-gzGzoHsz", "6NdDmnjpXWSID9LCFzBO3CPj");
         AVIMMessageManager.registerMessageHandler(AVIMTextMessage.class, new MessageHandler(this));
         //AVIMMessageManager.registerMessageHandler(AVIMMessage.class, new MessageBaseHandler(this));
-        AVInstallation.getCurrentInstallation().saveInBackground();
         PushService.setDefaultPushCallback(this, ReceiveMessageActivity.class);
+        AVInstallation.getCurrentInstallation().saveInBackground();
     }
 }
