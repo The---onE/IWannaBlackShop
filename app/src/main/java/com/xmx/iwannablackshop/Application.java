@@ -19,6 +19,7 @@ public class Application extends android.app.Application {
         AVIMMessageManager.registerMessageHandler(AVIMTextMessage.class, new MessageHandler(this));
         //AVIMMessageManager.registerMessageHandler(AVIMMessage.class, new MessageBaseHandler(this));
         PushService.setDefaultPushCallback(this, ReceiveMessageActivity.class);
+        PushService.subscribe(this, "systemmessage", ReceiveMessageActivity.class);
         AVInstallation.getCurrentInstallation().saveInBackground();
     }
 }

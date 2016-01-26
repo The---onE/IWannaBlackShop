@@ -5,16 +5,19 @@ import android.content.SharedPreferences;
 
 import com.avos.avoscloud.AVACL;
 import com.avos.avoscloud.AVException;
+import com.avos.avoscloud.AVInstallation;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
 import com.avos.avoscloud.CountCallback;
 import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.GetCallback;
+import com.avos.avoscloud.PushService;
 import com.avos.avoscloud.SaveCallback;
 import com.avos.avoscloud.im.v2.AVIMClient;
 import com.avos.avoscloud.im.v2.AVIMException;
 import com.avos.avoscloud.im.v2.callback.AVIMClientCallback;
 import com.xmx.iwannablackshop.Chat.AVImClientManager;
+import com.xmx.iwannablackshop.PushMessage.ReceiveMessageActivity;
 import com.xmx.iwannablackshop.User.Callback.AutoLoginCallback;
 import com.xmx.iwannablackshop.User.Callback.LoginCallback;
 import com.xmx.iwannablackshop.User.Callback.RegisterCallback;
@@ -69,7 +72,7 @@ public class UserManager {
         return mSP.getString("username", "");
     }
 
-    public void login(String un, String cs, String nn) {
+    public void login(AVObject user, String un, String cs, String nn) {
         SharedPreferences.Editor editor = mSP.edit();
         editor.putBoolean("loggedin", true);
         editor.putString("username", un);
@@ -79,10 +82,18 @@ public class UserManager {
 
         saveLog(un);
 
+        List<String> subscribing = user.getList("subscribing");
+        if (subscribing != null) {
+            for (String sub : subscribing) {
+                PushService.subscribe(mContext, UserManager.getSHA(sub), ReceiveMessageActivity.class);
+            }
+            AVInstallation.getCurrentInstallation().saveInBackground();
+        }
+
         openClient(nn);
     }
 
-    public void logout() {
+    public void logout(AVObject user) {
         SharedPreferences.Editor editor = mSP.edit();
         editor.putBoolean("loggedin", false);
         editor.putString("username", "");
@@ -90,7 +101,51 @@ public class UserManager {
         editor.putString("nickname", "");
         editor.apply();
 
+        List<String> subscribing = user.getList("subscribing");
+        if (subscribing != null) {
+            for (String sub : subscribing) {
+                PushService.unsubscribe(mContext, UserManager.getSHA(sub));
+            }
+            AVInstallation.getCurrentInstallation().saveInBackground();
+        }
+
         closeClient();
+    }
+
+    public void logout() {
+        if (isLoggedIn()) {
+            String username = getUsername();
+            AVQuery<AVObject> query = new AVQuery<>("UserData");
+            query.whereEqualTo("username", username);
+            query.findInBackground(new FindCallback<AVObject>() {
+                @Override
+                public void done(List<AVObject> list, AVException e) {
+                    if (e == null) {
+                        if (list.size() > 0) {
+                            SharedPreferences.Editor editor = mSP.edit();
+                            editor.putBoolean("loggedin", false);
+                            editor.putString("username", "");
+                            editor.putString("checksum", "");
+                            editor.putString("nickname", "");
+                            editor.apply();
+
+                            AVObject user = list.get(0);
+                            List<String> subscribing = user.getList("subscribing");
+                            if (subscribing != null) {
+                                for (String sub : subscribing) {
+                                    PushService.unsubscribe(mContext, UserManager.getSHA(sub));
+                                }
+                                AVInstallation.getCurrentInstallation().saveInBackground();
+                            }
+
+                            closeClient();
+                        }
+                    } else {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 
     public void saveLog(String username) {
@@ -174,7 +229,7 @@ public class UserManager {
                                             @Override
                                             public void done(AVException e) {
                                                 if (e == null) {
-                                                    login(username, checksum, nickname);
+                                                    login(data, username, checksum, nickname);
                                                     registerCallback.success();
                                                 } else {
                                                     registerCallback.errorNetwork();
@@ -208,7 +263,7 @@ public class UserManager {
                         if (rightPassword.equals(getSHA(password))) {
                             user.getAVObject("data").fetchIfNeededInBackground(new GetCallback<AVObject>() {
                                 @Override
-                                public void done(AVObject data, AVException e) {
+                                public void done(final AVObject data, AVException e) {
                                     if (e == null) {
                                         final String nickname = data.getString("nickname");
                                         final String newChecksum = makeChecksum();
@@ -217,7 +272,7 @@ public class UserManager {
                                             @Override
                                             public void done(AVException e) {
                                                 if (e == null) {
-                                                    login(username, newChecksum, nickname);
+                                                    login(data, username, newChecksum, nickname);
                                                     loginCallback.success(user);
                                                 } else {
                                                     loginCallback.errorNetwork();
@@ -265,7 +320,7 @@ public class UserManager {
                                 @Override
                                 public void done(AVException e) {
                                     if (e == null) {
-                                        login(username, newChecksum, nickname);
+                                        login(user, username, newChecksum, nickname);
                                         loginCallback.success(user);
                                     } else {
                                         loginCallback.errorNetwork();
@@ -273,7 +328,7 @@ public class UserManager {
                                 }
                             });
                         } else {
-                            logout();
+                            logout(user);
                             loginCallback.errorChecksum();
                         }
                     } else {
@@ -304,7 +359,7 @@ public class UserManager {
                         if (checksum.equals(getSHA(getChecksum()))) {
                             loginCallback.success(user);
                         } else {
-                            logout();
+                            logout(user);
                             loginCallback.errorChecksum();
                         }
                     } else {
