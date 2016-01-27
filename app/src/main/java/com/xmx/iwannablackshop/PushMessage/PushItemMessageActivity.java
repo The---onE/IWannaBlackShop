@@ -50,6 +50,9 @@ public class PushItemMessageActivity extends BaseTempActivity {
                         object.put("content", content.getText().toString());
                     }
 
+                    object.put("item", item);
+                    object.put("action", "com.avos.ITEM_MESSAGE");
+
                     AVQuery pushQuery = AVInstallation.getQuery();
                     pushQuery.whereEqualTo("channels", UserManager.getSHA(item));
                     AVPush push = new AVPush();
